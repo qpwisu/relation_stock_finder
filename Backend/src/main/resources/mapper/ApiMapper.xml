@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hany.stockapi.mapper.ApiMapper">
+
+    <select id="findStockByCompanyName" resultType="StockInfoDTO">
+          SELECT * FROM KR_STOCK_INFO_TB WHERE companyName = #{companyName};
+    </select>
+
+    <select id="findTickerByCompanyName" resultType="String">
+        SELECT ticker FROM KR_STOCK_INFO_TB WHERE companyName = #{companyName};
+    </select>
+
+    <select id="findPeriodPriceByTicker" resultType="StockPriceDTO">
+        SELECT * FROM KR_STOCK_PRICE_TB  WHERE ticker = #{ticker} order by date desc limit 50;
+    </select>
+
+    <select id="findAggregateCategory" resultType="AggregateDTO">
+        SELECT * FROM category_aggregate_TB  WHERE category = #{category} and companyName = #{companyName} and period = #{period} ;
+    </select>
+    <select id="findAggregateStock" resultType="AggregateDTO">
+        SELECT * FROM stock_aggregate_TB  WHERE category = #{category} and name = #{name} and period = #{period};
+    </select>
+
+    <select id="findDateAggregateCategory" resultType="DateAggregateDTO">
+        SELECT * FROM date_category_aggregate_TB  WHERE category = #{category} and name = #{name} ;
+    </select>
+
+    <select id="findPriceByCompanyName" resultType="StockNowPriceDTO">
+        SELECT ticker,companyName,close,changeRate FROM KR_NOW_STOCK_PRICE_TB WHERE companyName = #{companyName};
+    </select>
+
+    <select id="selectCategoryTotal" resultType="CategoryTotalDTO">
+        SELECT * FROM total_category_aggregate_TB  WHERE category = #{category} and period = #{period};
+    </select>
+
+    <select id="selectCategoryRelationStockTotal" resultType="CategoryRelationStockTotalDTO">
+        SELECT * FROM total_stock_aggregate_TB WHERE category = #{category} and period = #{period};
+    </select>
+
+    <select id="selectStockNowPriceDTO" resultType="StockNowPriceDTO">
+        SELECT ticker,companyName,close,changeRate FROM KR_NOW_STOCK_PRICE_TB order by changeRate desc limit 10;
+    </select>
+
+    <select id="findStock" resultType="String">
+        select companyName from KR_STOCK_INFO_TB WHERE companyName LIKE CONCAT('%', #{query}, '%');
+    </select>
+    <select id="findPolitician" resultType="String">
+        select name from Politician_TB WHERE name LIKE CONCAT('%', #{query}, '%');
+
+    </select>
+    <select id="findSector" resultType="String">
+        select sector from KR_STOCK_SECTOR_TB WHERE sector LIKE CONCAT('%', #{query}, '%');
+    </select>
+    <select id="findThema" resultType="String">
+        select thema from KR_STOCK_THEMA_TB WHERE thema LIKE CONCAT('%', #{query}, '%');
+    </select>
+
+    <select id="findBlogPolitician" resultType="BlogDTO">
+        select title,header,href,date from Politician_Blog_TB where name= #{name} order by date desc limit 10 offset #{offset};
+    </select>
+    <select id="findBlogThema" resultType="BlogDTO">
+        select title,header,href,date from Thema_Blog_TB where thema= #{name} order by date desc limit 10 offset #{offset};
+    </select>
+    <select id="findBlogSector" resultType="BlogDTO">
+        select title,header,href,date from Sector_Blog_TB where sector= #{name} order by date desc limit 10 offset #{offset};
+    </select>
+
+</mapper>

@@ -1,0 +1,49 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.hany'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+test {
+	useJUnitPlatform()
+}
+dependencies {
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+	testImplementation 'junit:junit:4.13.2'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
+//	testImplementation 'org.springframework.security:spring-security-test'
+	//junit
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+	testImplementation 'com.h2database:h2'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
