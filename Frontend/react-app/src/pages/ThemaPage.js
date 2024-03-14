@@ -145,7 +145,7 @@ function ThemaPage() {
                                 {data2.map((row) => (
                                 <TableRow key={row.ranking}>
                                     <TableCell  component="th" scope="row">{row.ranking}</TableCell>
-                                    <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.companyName)}>{row.companyName}</TableCell>
+                                    <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.company_name)}>{row.company_name}</TableCell>
                                     <TableCell align="right">{row.cnt}</TableCell>
                                 </TableRow>
                                 ))}

@@ -5,6 +5,8 @@ import logo from './logo.png'; // 로고 이미지 경로에 맞게 조정해주
 import { Box, FormControl, InputLabel, Select, MenuItem, Divider, TextField, Button } from '@mui/material';
 import axios from 'axios';
 
+const host = process.env.REACT_APP_HOST
+const port = process.env.REACT_APP_PORT
 const Layout = ({ children }) => {
     const navigate = useNavigate(); // useNavigate 훅을 사용
     // 이미지 클릭 핸들러
@@ -46,7 +48,7 @@ const Layout = ({ children }) => {
 
     useEffect(() => {
         if (searchTerm.length >= 1) { // 사용자가 2글자 이상 입력했을 때만 요청
-            axios.get(`http://localhost:8081/api/common/autocomplete?query=${searchTerm}&category=${searchType}`)
+            axios.get(`http://${host}:${port}/api/common/autocomplete?query=${searchTerm}&category=${searchType}`)
                 .then(response => {
                     setSuggestions(response.data);
                 })

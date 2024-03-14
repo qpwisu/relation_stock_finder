@@ -14,6 +14,6 @@ public class StockPriceDTO {
     private Float low;
     private Float close;
     private Float volume;
-    private Float changeRate;
+    private Float change_rate;
 }
 

@@ -40,17 +40,17 @@ class StockInfoControllerTest {
         String testTicker = "005490";
         StockInfoDTO mockStockInfo = StockInfoDTO.builder()
                 .ticker("005490")
-                .companyName("신성통상")
+                .company_name("신성통상")
                 .market("KOSPI")
-                .companyDescription("동사는 1968년 설립된 이후 니트의류 수출기업으로서 주문자상표부착(OEM)방식의 수출을 영위, 현재 Target, WalMart 등 대형 Buyer 위주로 영업을 전개하고 있으며, 신규 Buyer 확보함.\n동사의 핵심 생산기지인 Nicaragua 중남미 현지법인과 더불어 Vietnam에 소재한 현지법인에 대규모 신·증설을 추진.\n신규 Buyer와의 Direct 영업을 통해 수익성을 개선함으로서 활발한 영업을 전개.")
+                .company_description("동사는 1968년 설립된 이후 니트의류 수출기업으로서 주문자상표부착(OEM)방식의 수출을 영위, 현재 Target, WalMart 등 대형 Buyer 위주로 영업을 전개하고 있으며, 신규 Buyer 확보함.\n동사의 핵심 생산기지인 Nicaragua 중남미 현지법인과 더불어 Vietnam에 소재한 현지법인에 대규모 신·증설을 추진.\n신규 Buyer와의 Direct 영업을 통해 수익성을 개선함으로서 활발한 영업을 전개.")
                 .sector("섬유,의류,신발,호화품")
-                .marketCap(BigDecimal.valueOf(284300000000.00))
+                .market_cap(BigDecimal.valueOf(284300000000.00))
                 .per(4.27F)
                 .eps(463.0F)
                 .pbr(0.69F)
                 .bps(2879.0F)
                 .divided(50.0F)
-                .dividedRate(2.53F)
+                .divided_rate(2.53F)
                 .build();
 
 

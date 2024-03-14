@@ -2,47 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hany.stockapi.mapper.ApiMapper">
 
-    <select id="findStockByCompanyName" resultType="StockInfoDTO">
-          SELECT * FROM KR_STOCK_INFO_TB WHERE companyName = #{companyName};
+    <select id="findStockBycompany_name" resultType="StockInfoDTO">
+          SELECT * FROM stock_info WHERE company_name = #{company_name};
     </select>
 
-    <select id="findTickerByCompanyName" resultType="String">
-        SELECT ticker FROM KR_STOCK_INFO_TB WHERE companyName = #{companyName};
+    <select id="findTickerBycompany_name" resultType="String">
+        SELECT ticker FROM stock_info WHERE company_name = #{company_name};
     </select>
 
     <select id="findPeriodPriceByTicker" resultType="StockPriceDTO">
-        SELECT * FROM KR_STOCK_PRICE_TB  WHERE ticker = #{ticker} order by date desc limit 50;
+        SELECT * FROM stock_price  WHERE ticker = #{ticker} order by date desc limit 50;
     </select>
 
     <select id="findAggregateCategory" resultType="AggregateDTO">
-        SELECT * FROM category_aggregate_TB  WHERE category = #{category} and companyName = #{companyName} and period = #{period} ;
+        SELECT * FROM category_aggregate  WHERE category = #{category} and company_name = #{company_name} and period = #{period} ;
     </select>
     <select id="findAggregateStock" resultType="AggregateDTO">
-        SELECT * FROM stock_aggregate_TB  WHERE category = #{category} and name = #{name} and period = #{period};
+        SELECT * FROM stock_aggregate  WHERE category = #{category} and name = #{name} and period = #{period};
     </select>
 
     <select id="findDateAggregateCategory" resultType="DateAggregateDTO">
-        SELECT * FROM date_category_aggregate_TB  WHERE category = #{category} and name = #{name} ;
+        SELECT * FROM date_category_aggregate  WHERE category = #{category} and name = #{name} ;
     </select>
 
-    <select id="findPriceByCompanyName" resultType="StockNowPriceDTO">
-        SELECT ticker,companyName,close,changeRate FROM KR_NOW_STOCK_PRICE_TB WHERE companyName = #{companyName};
+    <select id="findPriceBycompany_name" resultType="StockNowPriceDTO">
+        SELECT ticker,company_name,close,change_rate FROM now_stock_price WHERE company_name = #{company_name};
     </select>
 
     <select id="selectCategoryTotal" resultType="CategoryTotalDTO">
-        SELECT * FROM total_category_aggregate_TB  WHERE category = #{category} and period = #{period};
+        SELECT * FROM total_category_aggregate  WHERE category = #{category} and period = #{period};
     </select>
 
     <select id="selectCategoryRelationStockTotal" resultType="CategoryRelationStockTotalDTO">
-        SELECT * FROM total_stock_aggregate_TB WHERE category = #{category} and period = #{period};
+        SELECT * FROM total_stock_aggregate WHERE category = #{category} and period = #{period};
     </select>
 
     <select id="selectStockNowPriceDTO" resultType="StockNowPriceDTO">
-        SELECT ticker,companyName,close,changeRate FROM KR_NOW_STOCK_PRICE_TB order by changeRate desc limit 10;
+        SELECT ticker,company_name,close,change_rate FROM now_stock_price order by change_rate desc limit 10;
     </select>
 
     <select id="findStock" resultType="String">
-        select companyName from KR_STOCK_INFO_TB WHERE companyName LIKE CONCAT('%', #{query}, '%');
+        select company_name from stock_info WHERE company_name LIKE CONCAT('%', #{query}, '%');
     </select>
     <select id="findPolitician" resultType="String">
         select name from Politician_TB WHERE name LIKE CONCAT('%', #{query}, '%');
@@ -56,13 +56,13 @@
     </select>
 
     <select id="findBlogPolitician" resultType="BlogDTO">
-        select title,header,href,date from Politician_Blog_TB where name= #{name} order by date desc limit 10 offset #{offset};
+        select title,header,href,date from politician_blog where name= #{name} order by date desc limit 10 offset #{offset};
     </select>
     <select id="findBlogThema" resultType="BlogDTO">
-        select title,header,href,date from Thema_Blog_TB where thema= #{name} order by date desc limit 10 offset #{offset};
+        select title,header,href,date from thema_blog where thema= #{name} order by date desc limit 10 offset #{offset};
     </select>
     <select id="findBlogSector" resultType="BlogDTO">
-        select title,header,href,date from Sector_Blog_TB where sector= #{name} order by date desc limit 10 offset #{offset};
+        select title,header,href,date from sector_blog where sector= #{name} order by date desc limit 10 offset #{offset};
     </select>
 
 </mapper>

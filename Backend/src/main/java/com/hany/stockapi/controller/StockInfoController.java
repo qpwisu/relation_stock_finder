@@ -22,16 +22,16 @@ public class StockInfoController {
 
     // 주식 정보 검색
     @GetMapping("/info")
-    public ResponseEntity<ApiResponseDTO<StockInfoDTO>> getStockInfo(@RequestParam String companyName) {
-        StockInfoDTO stockInfo = stockInfoService.getStockInfoByCompanyName(companyName);
+    public ResponseEntity<ApiResponseDTO<StockInfoDTO>> getStockInfo(@RequestParam String company_name) {
+        StockInfoDTO stockInfo = stockInfoService.getStockInfoBycompany_name(company_name);
         if (stockInfo == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(ApiResponseDTO.ok(stockInfo));
     }
     @GetMapping("/price")
-    public ResponseEntity<ApiResponseDTO<StockNowPriceDTO>> getStockPrice(@RequestParam String companyName) {
-        StockNowPriceDTO stockPrice = stockInfoService.getPriceInfoByCompanyName(companyName);
+    public ResponseEntity<ApiResponseDTO<StockNowPriceDTO>> getStockPrice(@RequestParam String company_name) {
+        StockNowPriceDTO stockPrice = stockInfoService.getPriceInfoBycompany_name(company_name);
         if (stockPrice == null) {
             return ResponseEntity.notFound().build();
         }
@@ -39,8 +39,8 @@ public class StockInfoController {
     }
 
     @GetMapping("/price/period")
-    public ResponseEntity<ApiResponseDTO<List<StockPriceDTO> >> getPeriodStockPrice(@RequestParam String companyName) {
-        String ticker = stockInfoService.getTickerByCompanyName(companyName);
+    public ResponseEntity<ApiResponseDTO<List<StockPriceDTO> >> getPeriodStockPrice(@RequestParam String company_name) {
+        String ticker = stockInfoService.getTickerBycompany_name(company_name);
         List<StockPriceDTO>  stockPrice = stockInfoService.getPeriodPriceByTicker(ticker);
         if (stockPrice == null) {
             return ResponseEntity.notFound().build();
@@ -49,12 +49,12 @@ public class StockInfoController {
     }
 
     @GetMapping("/aggregate/category")
-    public ResponseEntity<ApiResponseDTO<List<AggregateDTO> >> getAggregateCategory(@RequestParam String companyName,@RequestParam String category,@RequestParam Integer period) {
+    public ResponseEntity<ApiResponseDTO<List<AggregateDTO> >> getAggregateCategory(@RequestParam String company_name,@RequestParam String category,@RequestParam Integer period) {
         List<AggregateDTO> info = new ArrayList<>(); // `info`를 메소드의 시작 부분에서 선언 및 초기화
         ArrayList<Integer> allowedPeriods = new ArrayList<>(Arrays.asList(1,7,30,90,180));
 
         if (category.equals("politician") || category.equals("thema") || category.equals("sector")) {
-            info = stockInfoService.getAggregateCategory(companyName,category,period);
+            info = stockInfoService.getAggregateCategory(company_name,category,period);
         }
         else{
             return ResponseEntity.badRequest().body(ApiResponseDTO.error("잘못된 경로입니다"));

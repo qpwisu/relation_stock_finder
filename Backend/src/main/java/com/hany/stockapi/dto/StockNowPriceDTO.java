@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class StockNowPriceDTO {
     private String ticker;
-    private String companyName;
+    private String company_name;
     private Float close;
-    private Float changeRate;
+    private Float change_rate;
 }

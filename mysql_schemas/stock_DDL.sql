@@ -3,17 +3,17 @@ use STOCK;
 DROP TABLE IF EXISTS KR_STOCK_INFO_TB;
 CREATE TABLE `KR_STOCK_INFO_TB` (
 	`ticker`	VARCHAR(10)	NOT NULL,
-	`companyName`	VARCHAR(20)	NULL,
+	`company_name`	VARCHAR(20)	NULL,
 	`market`	VARCHAR(10)	NULL,
-	`companyDescription`	TEXT	NULL,
+	`company_description`	TEXT	NULL,
 	`sector` VARCHAR(50) NULL,
-    `marketCap` DECIMAL(20, 2) NULL,
+    `market_cap` DECIMAL(20, 2) NULL,
     `per` FLOAT NULL,
     `eps` FLOAT NULL,
     `pbr` FLOAT NULL,
     `bps` FLOAT NULL,
     `divided` FLOAT NULL,
-    `dividedRate` FLOAT NULL
+    `divided_rate` FLOAT NULL
 );
 
 
@@ -61,23 +61,23 @@ CREATE TABLE `KR_STOCK_THEMA_TB` (
 
 drop table if exists thema_blog_TB;
 CREATE TABLE `thema_blog_TB` (
-	blogID INT AUTO_INCREMENT,
+	blog_id INT AUTO_INCREMENT,
 	`thema`	VARCHAR(30)	NOT NULL,
 	`title` text,
 	`header`text,
 	`href`text,
     Date DATE,
-	PRIMARY KEY (blogID),
+	PRIMARY KEY (blog_id),
 	CONSTRAINT `FK_thema_TB` FOREIGN KEY (`thema`) REFERENCES `KR_STOCK_THEMA_TB`(`thema`)
 );
 
 drop table if exists blog_thema_analysis_TB;
 CREATE TABLE `blog_thema_analysis_TB` (
 	id INT AUTO_INCREMENT,
-    blogID INT,
-	companyName VARCHAR(30)	NULL,
+    blog_id INT,
+	company_name VARCHAR(30)	NULL,
 	PRIMARY KEY (id),
-	CONSTRAINT `FK_thema_blog_TB` FOREIGN KEY (`blogID`) REFERENCES `thema_blog_TB`(`blogID`)
+	CONSTRAINT `FK_thema_blog_TB` FOREIGN KEY (`blog_id`) REFERENCES `thema_blog_TB`(`blog_id`)
 );
 
 drop table if exists KR_STOCK_SECTOR_TB;
@@ -88,23 +88,23 @@ CREATE TABLE `KR_STOCK_SECTOR_TB` (
 
 drop table if exists sector_blog_TB;
 CREATE TABLE `sector_blog_TB` (
-	blogID INT AUTO_INCREMENT,
+	blog_id INT AUTO_INCREMENT,
 	`sector`	VARCHAR(30)	NOT NULL,
 	`title` text,
 	`header`text,
 	`href`text,
     Date DATE,
-	PRIMARY KEY (blogID),
+	PRIMARY KEY (blog_id),
 	CONSTRAINT `FK_sector_TB` FOREIGN KEY (`sector`) REFERENCES `KR_STOCK_SECTOR_TB`(`sector`)
 );
 
 drop table if exists blog_sector_analysis_TB;
 CREATE TABLE `blog_sector_analysis_TB` (
 	id INT AUTO_INCREMENT,
-    blogID INT,
-	companyName VARCHAR(30)	NULL,
+    blog_id INT,
+	company_name VARCHAR(30)	NULL,
 	PRIMARY KEY (id),
-	CONSTRAINT `FK_sector_blog_TB` FOREIGN KEY (`blogID`) REFERENCES `sector_blog_TB`(`blogID`)
+	CONSTRAINT `FK_sector_blog_TB` FOREIGN KEY (`blog_id`) REFERENCES `sector_blog_TB`(`blog_id`)
 );
 
 
@@ -122,23 +122,23 @@ CREATE TABLE `Politician_TB` (
 
 drop table if exists politician_blog_TB;
 CREATE TABLE `politician_blog_TB` (
-	blogID INT AUTO_INCREMENT,
+	blog_id INT AUTO_INCREMENT,
 	`name`	VARCHAR(10)	NOT NULL,
 	`title` text,
 	`header`text,
 	`href`text,
     Date DATE,
-	PRIMARY KEY (blogID),
+	PRIMARY KEY (blog_id),
 	CONSTRAINT `FK_Politician_TB` FOREIGN KEY (`name`) REFERENCES `Politician_TB`(`name`)
 );
 
 drop table if exists blog_stock_analysis_TB;
 CREATE TABLE `blog_stock_analysis_TB` (
 	id INT AUTO_INCREMENT,
-    blogID INT,
-	`companyName` VARCHAR(20)	NULL,
+    blog_id INT,
+	`company_name` VARCHAR(20)	NULL,
 	PRIMARY KEY (id),
-	CONSTRAINT `FK_politician_blog_TB` FOREIGN KEY (`blogID`) REFERENCES `politician_blog_TB`(`blogID`)
+	CONSTRAINT `FK_politician_blog_TB` FOREIGN KEY (`blog_id`) REFERENCES `politician_blog_TB`(`blog_id`)
 );
 
 
@@ -146,7 +146,7 @@ CREATE TABLE `blog_stock_analysis_TB` (
 drop table if exists total_stock_aggregate_TB;
 CREATE TABLE total_stock_aggregate_TB (
 	category VARCHAR(10)	NOT NULL,
-	companyName	VARCHAR(10)	NOT NULL,
+	company_name	VARCHAR(10)	NOT NULL,
 	cnt int not null,
     ranking int not null,
     period int not null,
@@ -173,7 +173,7 @@ CREATE TABLE `KR_NOW_STOCK_PRICE_TB` (
 	`close` DECIMAL(20,4) NULL,
 	`volume` BIGINT NULL,
 	`changeRate` DECIMAL(10,2) NULL,
-	`companyName`	VARCHAR(10)	NOT NULL,
+	`company_name`	VARCHAR(10)	NOT NULL,
 	PRIMARY KEY (ticker),
 	CONSTRAINT `FK_KR_NOW_STOCK_PRICE_TB` FOREIGN KEY (`ticker`) REFERENCES `KR_STOCK_INFO_TB`(`ticker`)
 

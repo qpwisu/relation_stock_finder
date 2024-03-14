@@ -16,14 +16,14 @@ public class StockInfoService {
         this.apiMapper = apiMapper;
     }
 
-    public String getTickerByCompanyName(String companyName){
-        return apiMapper.findTickerByCompanyName(companyName);
+    public String getTickerBycompany_name(String company_name){
+        return apiMapper.findTickerBycompany_name(company_name);
     }
     public List<StockPriceDTO>  getPeriodPriceByTicker(String ticker) {
         return apiMapper.findPeriodPriceByTicker(ticker);
     }
-    public List<AggregateDTO>  getAggregateCategory(String companyName, String category, Integer period) {
-        return apiMapper.findAggregateCategory(companyName,category,period);
+    public List<AggregateDTO>  getAggregateCategory(String company_name, String category, Integer period) {
+        return apiMapper.findAggregateCategory(company_name,category,period);
     }
 
 
@@ -34,11 +34,11 @@ public class StockInfoService {
     public List<DateAggregateDTO>  getDateAggregateCategory(String name, String category) {
         return apiMapper.findDateAggregateCategory(name,category);
     }
-    public StockNowPriceDTO getPriceInfoByCompanyName(String companyName) {
-        return apiMapper.findPriceByCompanyName(companyName);
+    public StockNowPriceDTO getPriceInfoBycompany_name(String company_name) {
+        return apiMapper.findPriceBycompany_name(company_name);
     }
-    public StockInfoDTO getStockInfoByCompanyName(String companyName) {
-        return apiMapper.findStockByCompanyName(companyName);
+    public StockInfoDTO getStockInfoBycompany_name(String company_name) {
+        return apiMapper.findStockBycompany_name(company_name);
     }
 
 

@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 
+
+const host = process.env.REACT_APP_HOST
+const port = process.env.REACT_APP_PORT
+
 // 데이터를 가져오는 커스텀 훅
 const useFetchPoliticianTotalData = (category,period) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/total/category?category=${category}&period=${period}`)
+    fetch(`http://${host}:${port}/api/stock/total/category?category=${category}&period=${period}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -21,7 +25,7 @@ const useFetchStockTotalData = (category,period) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/total/stock?category=${category}&period=${period}`)
+    fetch(`http://${host}:${port}/api/stock/total/stock?category=${category}&period=${period}`)
       .then(response => response.json())
       .then(data => {
 
@@ -34,11 +38,11 @@ const useFetchStockTotalData = (category,period) => {
   return data; // 데이터 반환
 };
 
-const useFetchAggregateCategoryData = (companyName,category,period) => {
+const useFetchAggregateCategoryData = (company_name,category,period) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/aggregate/category?companyName=${companyName}&category=${category}&period=${period}`)
+    fetch(`http://${host}:${port}/api/stock/aggregate/category?company_name=${company_name}&category=${category}&period=${period}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -46,7 +50,7 @@ const useFetchAggregateCategoryData = (companyName,category,period) => {
         }
       })
       .catch(error => console.error('Error fetching data: ', error));
-  }, [companyName,category,period]);
+  }, [company_name,category,period]);
   return data; // 데이터 반환
 };
 
@@ -54,7 +58,7 @@ const useFetchAggregateStockData = (name,category,period) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/aggregate/stock?name=${name}&category=${category}&period=${period}`)
+    fetch(`http://${host}:${port}/api/stock/aggregate/stock?name=${name}&category=${category}&period=${period}`)
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -72,7 +76,7 @@ const useFetchBlog = (name,category,page) => {
   const [data, setData] = useState([]);
   
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/blog?name=${name}&category=${category}&page=${page}`)
+    fetch(`http://${host}:${port}/api/stock/blog?name=${name}&category=${category}&page=${page}`)
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -89,7 +93,7 @@ const useFetchDateAggregateStockData = (name,category) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/aggregate/date/category?name=${name}&category=${category}`)
+    fetch(`http://${host}:${port}/api/stock/aggregate/date/category?name=${name}&category=${category}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -105,7 +109,7 @@ const useFetchStockPriceData = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/stock/total/price`)
+    fetch(`http://${host}:${port}/api/stock/total/price`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -117,15 +121,15 @@ const useFetchStockPriceData = () => {
   return data; // 데이터 반환
 };
 
-const useStockInfo = (companyName) => {
+const useStockInfo = (company_name) => {
   const [stockInfo, setStockInfo] = useState(null);
 
   useEffect(() => {
-      if (!companyName) return; // companyName이 없는 경우 early return
+      if (!company_name) return; // company_name이 없는 경우 early return
 
       const fetchStockInfo = async () => {
           try {
-              const response = await fetch(`http://localhost:8081/api/stock/info?companyName=${encodeURIComponent(companyName)}`);
+              const response = await fetch(`http://${host}:${port}/api/stock/info?company_name=${encodeURIComponent(company_name)}`);
               const data = await response.json();
               if (data.success) {
                   setStockInfo(data.data);
@@ -136,20 +140,20 @@ const useStockInfo = (companyName) => {
       };
 
       fetchStockInfo();
-  }, [companyName]);
+  }, [company_name]);
 
   return stockInfo;
 };
 
-const useStockPrice = (companyName) => {
+const useStockPrice = (company_name) => {
   const [stockPrice, setStockPrice] = useState(null);
 
   useEffect(() => {
-      if (!companyName) return; // companyName이 없는 경우 early return
+      if (!company_name) return; // company_name이 없는 경우 early return
 
       const fetchStockPrice = async () => {
           try {
-              const response = await fetch(`http://localhost:8081/api/stock/price?companyName=${encodeURIComponent(companyName)}`);
+              const response = await fetch(`http://${host}:${port}/api/stock/price?company_name=${encodeURIComponent(company_name)}`);
               const data = await response.json();
               if (data.success) {
                 setStockPrice(data.data);
@@ -160,20 +164,20 @@ const useStockPrice = (companyName) => {
       };
 
       fetchStockPrice();
-  }, [companyName]);
+  }, [company_name]);
 
   return stockPrice;
 };
 
-const usePeriodStockPrice = (companyName) => {
+const usePeriodStockPrice = (company_name) => {
   const [stockPrice, setStockPrice] = useState(null);
 
   useEffect(() => {
-      if (!companyName) return; // companyName이 없는 경우 early return
+      if (!company_name) return; // company_name이 없는 경우 early return
 
       const fetchStockPrice = async () => {
           try {
-              const response = await fetch(`http://localhost:8081/api/stock/price/period?companyName=${encodeURIComponent(companyName)}`);
+              const response = await fetch(`http://${host}:${port}/api/stock/price/period?company_name=${encodeURIComponent(company_name)}`);
               const data = await response.json();
               if (data.success) {
                 setStockPrice(data.data.reverse());
@@ -184,7 +188,7 @@ const usePeriodStockPrice = (companyName) => {
       };
 
       fetchStockPrice();
-  }, [companyName]);
+  }, [company_name]);
 
   return stockPrice;
 };

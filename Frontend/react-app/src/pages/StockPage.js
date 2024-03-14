@@ -186,7 +186,7 @@ function StockPage() {
                             <Card raised elevation = {0} sx={{ mb: 4 }} style={{marginBottom:10}}>
                                 <CardContent>
                                     <Typography variant="h6" component="h3" gutterBottom>
-                                        {stockInfo.companyName} ({stockInfo.ticker})
+                                        {stockInfo.company_name} ({stockInfo.ticker})
                                     </Typography>
                                     <Box display="flex" justifyContent="flex-start" alignItems="center" gap={2}>
                                     <Typography variant="h5" component="h2" style={stockPrice ? changeRateStyle(stockPrice.changeRate) : {}} gutterBottom>
@@ -202,7 +202,7 @@ function StockPage() {
                                         시장: {stockInfo.market} | 섹터: {stockInfo.sector}
                                     </Typography>
                                     <Typography variant="body2" component="p">
-                                        {stockInfo.companyDescription}
+                                        {stockInfo.company_description}
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -211,13 +211,13 @@ function StockPage() {
                             <Paper elevation={0}  sx={{ p: 2 }}  style={{marginBottom:10}}>
                                 <Box display="flex" flexWrap="wrap" justifyContent="space-around">
                                     {Object.entries({
-                                        "시가 총액": `${stockInfo.marketCap.toLocaleString()}원`,
+                                        "시가 총액": `${stockInfo.market_cap.toLocaleString()}원`,
                                         "PER": stockInfo.per,
                                         "EPS": stockInfo.eps,
                                         "PBR": stockInfo.pbr,
                                         "BPS": stockInfo.bps,
                                         "배당금": `${stockInfo.divided}원`,
-                                        "배당률": `${stockInfo.dividedRate}%`
+                                        "배당률": `${stockInfo.divided_rate}%`
                                     }).map(([key, value], index) => (
                                         <Box key={index} minWidth={100} textAlign="center">
                                             <Typography variant="subtitle2" borderBottom={ '1px solid #eee'} gutterBottom>

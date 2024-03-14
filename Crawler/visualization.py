@@ -24,13 +24,13 @@ class Visualization:
     def visualization_politician_topN(self,start_date, end_date, topN):
         # 막대 그래프 그리기 가장 많은 블로그글이 올라온 정치인 topN
         dff = self.connector.default_query(
-            f"SELECT name, COUNT(name) AS cnt FROM politician_blog_TB WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY name ORDER BY cnt DESC LIMIT {topN};")
+            f"SELECT name, COUNT(name) AS cnt FROM politician_blog WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY name ORDER BY cnt DESC LIMIT {topN};")
         dff.plot.bar(x='name', y='cnt', rot=0)
 
         # 위 topN의 날짜별 언급 plot 그래프
         name_li = dff["name"].to_list()
         names_for_sql = ", ".join(f"'{name}'" for name in name_li)
-        df = self.connector.default_query(f"SELECT name,date, COUNT(*) AS cnt FROM politician_blog_TB WHERE name in ({names_for_sql}) and date >= '{start_date}' AND date <= '{end_date}' GROUP BY name, date ORDER BY name, date; ")
+        df = self.connector.default_query(f"SELECT name,date, COUNT(*) AS cnt FROM politician_blog WHERE name in ({names_for_sql}) and date >= '{start_date}' AND date <= '{end_date}' GROUP BY name, date ORDER BY name, date; ")
         df['date'] = pd.to_datetime(df['date'])
 
         # pivot을 사용하여 'name'을 컬럼으로, 'Date'를 인덱스로 재구성
@@ -52,17 +52,17 @@ class Visualization:
         input :  start_date, end_date, topN
     '''
     def visualization_stock_topN(self,start_date, end_date, topN):
-        dff= self.connector.default_query(f"SELECT bsa.companyName, count(*) as cnt FROM ( SELECT * FROM politician_blog_TB WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb INNER JOIN blog_stock_analysis_TB AS bsa ON pb.blogID = bsa.blogID group by bsa.companyName order by cnt desc limit {topN};")
-        dff.plot.bar(x='companyName', y='cnt', rot=0)
+        dff= self.connector.default_query(f"SELECT bsa.company_name, count(*) as cnt FROM ( SELECT * FROM politician_blog WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb INNER JOIN blog_politician_analysis AS bsa ON pb.blog_id = bsa.blog_id group by bsa.company_name order by cnt desc limit {topN};")
+        dff.plot.bar(x='company_name', y='cnt', rot=0)
 
         # 위 topN의 날짜별 언급  그래프
-        companyNames_li = dff["companyName"].to_list()
-        companyNames_for_sql = ", ".join(f"'{companyName}'" for companyName in companyNames_li)
-        df = self.connector.default_query(f"select pb.date,bs.companyName, count(*) as cnt from blog_stock_analysis_TB as bs join politician_blog_TB as pb on  bs.blogid= pb.blogid where bs.companyName in ({companyNames_for_sql}) and pb.date >= '{start_date}' AND pb.date <= '{end_date}' group by pb.date,bs.companyName; ")
+        company_names_li = dff["company_name"].to_list()
+        company_names_for_sql = ", ".join(f"'{company_name}'" for company_name in company_names_li)
+        df = self.connector.default_query(f"select pb.date,bs.company_name, count(*) as cnt from blog_politician_analysis as bs join politician_blog as pb on  bs.blog_id= pb.blog_id where bs.company_name in ({company_names_for_sql}) and pb.date >= '{start_date}' AND pb.date <= '{end_date}' group by pb.date,bs.company_name; ")
         df['date'] = pd.to_datetime(df['date'])
 
         # pivot을 사용하여 'name'을 컬럼으로, 'Date'를 인덱스로 재구성
-        pivot_df = df.pivot(index='date', columns='companyName', values='cnt')
+        pivot_df = df.pivot(index='date', columns='company_name', values='cnt')
         # plot 그래프 그리기
         pivot_df.plot(kind='line', marker='o', figsize=(10, 6))
         plt.title('날짜별 정치인 언급 횟수')
@@ -78,16 +78,16 @@ class Visualization:
         input :  start_date, end_date, politician, topN
     '''
     def visualization_topN(self,start_date, end_date, politician, topN):
-        df = self.connector.default_query(f"SELECT  pb.name,  bsa.companyName, count(*) as cnt FROM ( SELECT * FROM politician_blog_TB WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb INNER JOIN blog_stock_analysis_TB AS bsa ON pb.blogID = bsa.blogID group by pb.name,bsa.companyName ;")
+        df = self.connector.default_query(f"SELECT  pb.name,  bsa.company_name, count(*) as cnt FROM ( SELECT * FROM politician_blog WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb INNER JOIN blog_politician_analysis AS bsa ON pb.blog_id = bsa.blog_id group by pb.name,bsa.company_name ;")
         df2 = df[df["name"] == politician].sort_values(by=["cnt"],ascending=False)[:topN]
-        df2.plot.bar(x='companyName', y='cnt', rot=0 ,fontsize=6)
+        df2.plot.bar(x='company_name', y='cnt', rot=0 ,fontsize=6)
 
-        companyName_li = df2["companyName"].to_list()
-        companyNames_for_sql = ", ".join(f"'{companyName}'" for companyName in companyName_li)
-        df = self.connector.default_query(f"select pb.date,bs.companyName, count(*) as cnt from blog_stock_analysis_TB as bs join politician_blog_TB as pb on  bs.blogid= pb.blogid where pb.name = '{politician}' and bs.companyName in ({companyNames_for_sql}) and pb.date >= '{start_date}' AND pb.date <= '{end_date}' group by pb.date,bs.companyName; ")
+        company_name_li = df2["company_name"].to_list()
+        company_names_for_sql = ", ".join(f"'{company_name}'" for company_name in company_name_li)
+        df = self.connector.default_query(f"select pb.date,bs.company_name, count(*) as cnt from blog_politician_analysis as bs join politician_blog as pb on  bs.blog_id= pb.blog_id where pb.name = '{politician}' and bs.company_name in ({company_names_for_sql}) and pb.date >= '{start_date}' AND pb.date <= '{end_date}' group by pb.date,bs.company_name; ")
         df['date'] = pd.to_datetime(df['date'])
         # pivot을 사용하여 'name'을 컬럼으로, 'Date'를 인덱스로 재구성
-        pivot_df = df.pivot(index='date', columns='companyName', values='cnt')
+        pivot_df = df.pivot(index='date', columns='company_name', values='cnt')
         # plot 그래프 그리기
         pivot_df.plot(kind='line', marker='o', figsize=(10, 6))
         plt.title('날짜별 종목 언급 횟수')
@@ -102,10 +102,10 @@ class Visualization:
     '''
     
         기간동안 종목과 가장 많이 언급된 정치인 topn의 언급수 그래프로 시각화
-        input :  start_date, end_date, companyName, topN
+        input :  start_date, end_date, company_name, topN
     '''
-    def visualization_reverse_topN(self,start_date, end_date, companyName, topN):
-        df = self.connector.default_query(f"SELECT pb.name, count(*) as cnt FROM ( SELECT * FROM politician_blog_TB WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb INNER JOIN blog_stock_analysis_TB AS bsa ON pb.blogID = bsa.blogID where companyName = '{companyName}'  group by pb.name ;")
+    def visualization_reverse_topN(self,start_date, end_date, company_name, topN):
+        df = self.connector.default_query(f"SELECT pb.name, count(*) as cnt FROM ( SELECT * FROM politician_blog WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb INNER JOIN blog_politician_analysis AS bsa ON pb.blog_id = bsa.blog_id where company_name = '{company_name}'  group by pb.name ;")
         df2 = df.sort_values(by=["cnt"],ascending=False)[:topN]
         df2.plot.bar(x='name', y='cnt', rot=0 ,fontsize=6)
         plt.show()

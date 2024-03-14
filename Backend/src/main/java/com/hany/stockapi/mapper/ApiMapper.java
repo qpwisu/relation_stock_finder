@@ -8,16 +8,16 @@ import java.util.List;
 @Mapper
 public interface ApiMapper {
 
-    String findTickerByCompanyName(String companyName);
+    String findTickerBycompany_name(String company_name);
     List<StockPriceDTO> findPeriodPriceByTicker(String ticker);
-    List<AggregateDTO> findAggregateCategory(String companyName,String category, Integer period);
+    List<AggregateDTO> findAggregateCategory(String company_name,String category, Integer period);
     List<AggregateDTO> findAggregateStock(String name,String category, Integer period);
 
     List<DateAggregateDTO> findDateAggregateCategory(String name,String category);
 
-    StockNowPriceDTO findPriceByCompanyName(String companyName);
+    StockNowPriceDTO findPriceBycompany_name(String company_name);
 
-    StockInfoDTO findStockByCompanyName(String companyName);
+    StockInfoDTO findStockBycompany_name(String company_name);
     List<CategoryTotalDTO> selectCategoryTotal(Integer period,String category);
     List<CategoryRelationStockTotalDTO> selectCategoryRelationStockTotal(Integer period,String category);
     List<StockNowPriceDTO> selectStockNowPriceDTO();

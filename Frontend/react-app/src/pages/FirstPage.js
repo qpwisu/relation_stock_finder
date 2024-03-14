@@ -88,7 +88,7 @@ function FirstPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>Ticker</TableCell>
-                  <TableCell>CompanyName</TableCell>
+                  <TableCell>company_name</TableCell>
                   <TableCell align="right">Close</TableCell>
                   <TableCell align="right">ChangeRate</TableCell>
                 </TableRow>
@@ -97,7 +97,7 @@ function FirstPage() {
                 {data3.map((row) => (
                   <TableRow key={row.ticker}>
                     <TableCell component="th" scope="row">{row.ticker}</TableCell>
-                    <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.companyName)}>{row.companyName}</TableCell>
+                    <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.company_name)}>{row.company_name}</TableCell>
                     <TableCell align="right">{row.close}</TableCell>
                     <TableCell align="right" style={{color:"red",fontWeight:"bold"}}>{row.changeRate}</TableCell>
                   </TableRow>
@@ -265,7 +265,7 @@ function FirstPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>Ranking</TableCell>
-                  <TableCell>CompanyName</TableCell>
+                  <TableCell>company_name</TableCell>
                   <TableCell align="right">Count</TableCell>
                   <TableCell align="right">Period</TableCell>
                 </TableRow>
@@ -274,7 +274,7 @@ function FirstPage() {
                 {data2.map((row) => (
                   <TableRow key={row.ranking}>
                     <TableCell component="th" scope="row">{row.ranking}</TableCell>
-                    <TableCell style={{ cursor: 'pointer',fontWeight:"bold" }} onClick={() => handleNameClick("stock",row.companyName)}>{row.companyName}</TableCell>
+                    <TableCell style={{ cursor: 'pointer',fontWeight:"bold" }} onClick={() => handleNameClick("stock",row.company_name)}>{row.company_name}</TableCell>
                     <TableCell align="right">{row.cnt}</TableCell>
                     <TableCell align="right">{row.period}</TableCell>
                   </TableRow>
@@ -309,7 +309,7 @@ function FirstPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>Ranking</TableCell>
-                  <TableCell>CompanyName</TableCell>
+                  <TableCell>company_name</TableCell>
                   <TableCell align="right">Count</TableCell>
                   <TableCell align="right">Period</TableCell>
                 </TableRow>
@@ -318,7 +318,7 @@ function FirstPage() {
                 {data5.map((row) => (
                   <TableRow key={row.ranking}>
                     <TableCell component="th" scope="row">{row.ranking}</TableCell>
-                    <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.companyName)}>{row.companyName}</TableCell>
+                    <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.company_name)}>{row.company_name}</TableCell>
                     <TableCell align="right">{row.cnt}</TableCell>
                     <TableCell align="right">{row.period}</TableCell>
                   </TableRow>
@@ -353,7 +353,7 @@ function FirstPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>Ranking</TableCell>
-                  <TableCell>CompanyName</TableCell>
+                  <TableCell>company_name</TableCell>
                   <TableCell align="right">Count</TableCell>
                   <TableCell align="right">Period</TableCell>
                 </TableRow>
@@ -362,7 +362,7 @@ function FirstPage() {
                 {data7.map((row) => (
                   <TableRow key={row.ranking}>
                     <TableCell component="th" scope="row">{row.ranking}</TableCell>
-                    <TableCell style={{ cursor: 'pointer',fontWeight:"bold" }} onClick={() => handleNameClick("stock",row.companyName)}>{row.companyName}</TableCell>
+                    <TableCell style={{ cursor: 'pointer',fontWeight:"bold" }} onClick={() => handleNameClick("stock",row.company_name)}>{row.company_name}</TableCell>
                     <TableCell align="right">{row.cnt}</TableCell>
                     <TableCell align="right">{row.period}</TableCell>
                   </TableRow>

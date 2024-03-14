@@ -1,7 +1,7 @@
+from datetime import timedelta, datetime
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
-from datetime import datetime, timedelta
 from selenium.webdriver.common.by import By
 import pandas as pd
 import time
@@ -16,7 +16,8 @@ from tqdm import tqdm
 #
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-class PoliticianCrawler:
+
+class CategoryCrawler:
     def __init__(self):
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--headless')  # 창 없는 모드
@@ -34,7 +35,7 @@ class PoliticianCrawler:
                 driver = webdriver.Chrome(service=service, options=self.options)
                 return driver  # 드라이버 초기화에 성공하면 반환
             except Exception as e:
-                print(f"ChromeDriverManager install failed. Attempt {attempt+1}/{max_attempts}. Error: {e}")
+                print(f"ChromeDriverManager install failed. Attempt {attempt + 1}/{max_attempts}. Error: {e}")
                 if attempt < max_attempts - 1:
                     time.sleep(5)  # 다음 재시도 전 5초 대기
                 else:
@@ -77,7 +78,7 @@ class PoliticianCrawler:
         blog_header = driver.find_elements(By.CSS_SELECTOR, 'div.dsc_area > a.dsc_link')
         header_list = [header.text for header in blog_header]
 
-        if len(title_list) != len(header_list): # 헤더가 없는 경우가 있어 에러 처리 필요 ex) 안철수 20230220
+        if len(title_list) != len(header_list):  # 헤더가 없는 경우가 있어 에러 처리 필요 ex) 안철수 20230220
             header_list = []
             elements = driver.find_elements(By.CSS_SELECTOR, 'div.detail_box')
             for ele in elements:
@@ -88,7 +89,6 @@ class PoliticianCrawler:
                 else:
                     header_list.append(None)
 
-
         if len(title_list) == len(header_list) == len(href_list):
             df = pd.DataFrame({
                 'name': name,
@@ -98,7 +98,7 @@ class PoliticianCrawler:
                 'date': date
             })
         else:
-            print("error not same length : ",name,date)
+            print("error not same length : ", name, date)
             return
 
         driver.quit()
@@ -129,11 +129,11 @@ class PoliticianCrawler:
 
             for future in tqdm(as_completed(futures), total=len(futures)):
                 result = future.result()
-                df_li.append(result) # 결과를 DataFrame에 추가하는 로직
+                df_li.append(result)  # 결과를 DataFrame에 추가하는 로직
 
         df_combined = pd.concat(df_li, ignore_index=True)
         return df_combined
 
 # 사용 예시
-# t = PoliticianCrawler()
+# t = CategoryCrawler()
 # t.politician_blog_crawler(["이재명", "조국"], "20240201", "20240226")

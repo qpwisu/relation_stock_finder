@@ -37,8 +37,8 @@ class StockCrawler:
     def kr_stock_info_crawler(self, exist_ticker=[]):
         df_kp = fdr.StockListing('KOSPI')[["Code", "Name"]]
         df_kd = fdr.StockListing('KOSDAQ')[["Code", "Name"]]
-        df_kp.columns = ['ticker', 'companyName']
-        df_kd.columns = ['ticker', 'companyName']
+        df_kp.columns = ['ticker', 'company_name']
+        df_kd.columns = ['ticker', 'company_name']
         df_kp["market"] = "KOSPI"
         df_kd["market"] = "KOSDAQ"
         df_combined = pd.concat([df_kp, df_kd], ignore_index=True)
@@ -49,15 +49,15 @@ class StockCrawler:
 
         # 기업 개요 크롤링
         ticker_list = df_combined["ticker"].to_list()
-        companyDescription_list = []
+        company_description_list = []
         sector_list = []
-        marketCap_list = []
+        market_cap_list = []
         per_list = []
         eps_list = []
         pbr_list = []
         bps_list = []
         divided_list = []
-        dividedRate_list = []
+        divided_rate_list = []
         count = 0
         with sync_playwright() as p:
             browser = p.chromium.launch()  # 또는 p.firefox.launch(), p.webkit.launch()
@@ -81,10 +81,10 @@ class StockCrawler:
                         page.locator('#middle > div.h_company > div.wrap_company > div > em.summary > a').click()
                         elements_locator = page.locator('#summary_info > p')
                         elements_texts = elements_locator.all_text_contents()
-                        companyDescription_list.append("\n".join(elements_texts))
+                        company_description_list.append("\n".join(elements_texts))
                     except Exception as e:
                         print(f"기업개요 크롤링 실패 {ticker}: {e}")
-                        companyDescription_list.append(None)
+                        company_description_list.append(None)
 
                     # 시총, per 등 크롤링
                     try:
@@ -103,22 +103,22 @@ class StockCrawler:
                             tmp = tmp.split("\n")
                             dic[tmp[0]] = tmp[1]
 
-                        marketCap_list.append(self.extract_numbers_and_dots(dic["시총"]) * (10 ** 8))
+                        market_cap_list.append(self.extract_numbers_and_dots(dic["시총"]) * (10 ** 8))
                         per_list.append(self.extract_numbers_and_dots(dic["PER"]))
                         eps_list.append(self.extract_numbers_and_dots(dic["EPS"]))
                         pbr_list.append(self.extract_numbers_and_dots(dic["PBR"]))
                         bps_list.append(self.extract_numbers_and_dots(dic["BPS"]))
                         divided_list.append(self.extract_numbers_and_dots(dic["주당배당금"]))
-                        dividedRate_list.append(self.extract_numbers_and_dots(dic["배당수익률"]))
+                        divided_rate_list.append(self.extract_numbers_and_dots(dic["배당수익률"]))
                     except Exception as e:
                         print(f"이외 회사 정보 크로링 실패 {ticker}: {e}")
-                        marketCap_list.append(None)
+                        market_cap_list.append(None)
                         per_list.append(None)
                         eps_list.append(None)
                         pbr_list.append(None)
                         bps_list.append(None)
                         divided_list.append(None)
-                        dividedRate_list.append(None)
+                        divided_rate_list.append(None)
 
                 except Exception as e:
                     print(f"페이지 이동 실패 {ticker}: {e}")
@@ -131,15 +131,15 @@ class StockCrawler:
                         page = browser.new_page()
             browser.close()
 
-        df_combined["companyDescription"] = companyDescription_list
+        df_combined["company_description"] = company_description_list
         df_combined["sector"] = sector_list
-        df_combined["marketCap"] = marketCap_list
+        df_combined["market_cap"] = market_cap_list
         df_combined["per"] = per_list
         df_combined["eps"] = eps_list
         df_combined["pbr"] = pbr_list
         df_combined["bps"] = bps_list
         df_combined["divided"] = divided_list
-        df_combined["dividedRate"] = dividedRate_list
+        df_combined["divided_rate"] = divided_rate_list
 
         return df_combined
 
@@ -149,7 +149,7 @@ class StockCrawler:
     def nq_stock_info_crawler(self, exist_symbol=[]):
         df_nq = fdr.StockListing('NASDAQ')[["Symbol", "Name", "Industry"]]
         df_nq["market"] = "NASDAQ"
-        df_nq.columns = ['symbol', 'companyName', "industry", 'market']
+        df_nq.columns = ['symbol', 'company_name', "industry", 'market']
         df_nq = self.df_strip(df_nq)
         # exist_symbol에 있는 티커를 제외
         df_nq = df_nq[~df_nq['symbol'].isin(exist_symbol)]
@@ -159,13 +159,13 @@ class StockCrawler:
         name_kr_list = []
         company_description_list = []
         sector_list = []
-        marketCap_list = []
+        market_cap_list = []
         per_list = []
         eps_list = []
         pbr_list = []
         bps_list = []
         divided_list = []
-        dividedRate_list = []
+        divided_rate_list = []
         count = 0
         with sync_playwright() as p:
             browser = p.chromium.launch()  # 또는 p.firefox.launch(), p.webkit.launch()
@@ -207,7 +207,7 @@ class StockCrawler:
                         for i in range(len(elements)) :
                             tmp = elements[i].inner_text()[:3]
                             dic[tmp] = elements_value[i].inner_text()
-                        marketCap_list.append(self.extract_numbers_and_dots(dic["시총"].split("\n")[1]) * (10 ** 8))
+                        market_cap_list.append(self.extract_numbers_and_dots(dic["시총"].split("\n")[1]) * (10 ** 8))
                         per_list.append(self.extract_numbers_and_dots(dic["PER"]))
                         eps_list.append(self.extract_numbers_and_dots(dic["EPS"]))
                         pbr_list.append(self.extract_numbers_and_dots(dic["PBR"]))
@@ -215,17 +215,17 @@ class StockCrawler:
                         sector_list.append((dic["업종"]))
                         # 주당배당금, 배당수익률
                         divided_list.append(self.extract_numbers_and_dots(dic["주당배"]))
-                        dividedRate_list.append(self.extract_numbers_and_dots(dic["배당수"]))
+                        divided_rate_list.append(self.extract_numbers_and_dots(dic["배당수"]))
                     except Exception as e:
                         print(f"이외 회사 정보 크로링 실패 {symbol}: {e}")
-                        marketCap_list.append(None)
+                        market_cap_list.append(None)
                         per_list.append(None)
                         eps_list.append(None)
                         pbr_list.append(None)
                         sector_list.append(None)
                         bps_list.append(None)
                         divided_list.append(None)
-                        dividedRate_list.append(None)
+                        divided_rate_list.append(None)
 
                 except Exception as e:
                     print(f"페이지 이동 실패 {symbol}: {e}")
@@ -238,16 +238,16 @@ class StockCrawler:
                         count = 0
                         page = browser.new_page()
             browser.close()
-        df_nq["companyNameKR"] = name_kr_list
-        df_nq["companyDescription"] = company_description_list
+        df_nq["company_nameKR"] = name_kr_list
+        df_nq["company_description"] = company_description_list
         df_nq["sector"] = sector_list
-        df_nq["marketCap"] = marketCap_list
+        df_nq["market_cap"] = market_cap_list
         df_nq["per"] = per_list
         df_nq["eps"] = eps_list
         df_nq["pbr"] = pbr_list
         df_nq["bps"] = bps_list
         df_nq["divided"] = divided_list
-        df_nq["dividedRate"] = dividedRate_list
+        df_nq["divided_rate"] = divided_rate_list
 
         return df_nq
 
@@ -270,10 +270,10 @@ class StockCrawler:
             '저가': 'low',
             '종가': 'close',
             '거래량': 'volume',
-            '등락률': 'changeRate',
+            '등락률': 'change_rate',
             '티커': 'ticker'
         }, inplace=True)
-        df_kr_price = df_kr_price[['date', 'ticker', 'open', 'high', 'low', 'close', 'volume', 'changeRate']]
+        df_kr_price = df_kr_price[['date', 'ticker', 'open', 'high', 'low', 'close', 'volume', 'change_rate']]
         return df_kr_price
 
     '''
@@ -293,10 +293,10 @@ class StockCrawler:
             '저가': 'low',
             '종가': 'close',
             '거래량': 'volume',
-            '등락률': 'changeRate',
+            '등락률': 'change_rate',
             '티커': 'ticker'
         }, inplace=True)
-        df_kr_price = df_kr_price[['date', 'ticker', 'open', 'high', 'low', 'close', 'volume', 'changeRate']]
+        df_kr_price = df_kr_price[['date', 'ticker', 'open', 'high', 'low', 'close', 'volume', 'change_rate']]
         return df_kr_price
 
     '''

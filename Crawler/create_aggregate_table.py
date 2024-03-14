@@ -22,7 +22,7 @@ class CreateAggregateTable():
             start_date = (datetime.datetime.now() - datetime.timedelta(days=1+period)).strftime('%Y-%m-%d')
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             dff = self.connector.default_query(
-                f"SELECT thema, COUNT(thema) AS cnt FROM thema_blog_TB WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY thema ORDER BY cnt DESC LIMIT {topN};")
+                f"SELECT thema, COUNT(thema) AS cnt FROM thema_blog WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY thema ORDER BY cnt DESC LIMIT {topN};")
             dff['ranking'] = dff.index + 1
             dff['period'] = period
             df_list.append(dff)
@@ -43,7 +43,7 @@ class CreateAggregateTable():
             start_date = (datetime.datetime.now() - datetime.timedelta(days=1+period)).strftime('%Y-%m-%d')
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             dff = self.connector.default_query(
-                f"SELECT sector, COUNT(sector) AS cnt FROM sector_blog_TB WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY sector ORDER BY cnt DESC LIMIT {topN};")
+                f"SELECT sector, COUNT(sector) AS cnt FROM sector_blog WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY sector ORDER BY cnt DESC LIMIT {topN};")
             dff['ranking'] = dff.index + 1
             dff['period'] = period
             df_list.append(dff)
@@ -62,7 +62,7 @@ class CreateAggregateTable():
             start_date = (datetime.datetime.now() - datetime.timedelta(days=1+period)).strftime('%Y-%m-%d')
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             dff = self.connector.default_query(
-                f"SELECT name, COUNT(name) AS cnt FROM politician_blog_TB WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY name ORDER BY cnt DESC LIMIT {topN};")
+                f"SELECT name, COUNT(name) AS cnt FROM politician_blog WHERE date >= '{start_date}' AND date <= '{end_date}' GROUP BY name ORDER BY cnt DESC LIMIT {topN};")
             dff['ranking'] = dff.index + 1
             dff['period'] = period
             df_list.append(dff)
@@ -81,11 +81,11 @@ class CreateAggregateTable():
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             dff = self.connector.default_query(
                 f"""
-                SELECT bsa.companyName, count(*) as cnt 
-                FROM ( SELECT * FROM politician_blog_TB WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb 
-                INNER JOIN blog_stock_analysis_TB AS bsa ON pb.blogID = bsa.blogID 
-                WHERE bsa.companyName NOT IN ('레이')
-                group by bsa.companyName 
+                SELECT bsa.company_name, count(*) as cnt 
+                FROM ( SELECT * FROM politician_blog WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb 
+                INNER JOIN blog_politician_analysis AS bsa ON pb.blog_id = bsa.blog_id 
+                WHERE bsa.company_name NOT IN ('레이')
+                group by bsa.company_name 
                 order by cnt desc 
                 limit {topN};
                 """)
@@ -108,11 +108,11 @@ class CreateAggregateTable():
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             dff = self.connector.default_query(
                 f"""
-                SELECT bsa.companyName, count(*) as cnt 
-                FROM ( SELECT * FROM sector_blog_TB WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb 
-                INNER JOIN blog_thema_analysis_TB AS bsa ON pb.blogID = bsa.blogID 
-                WHERE bsa.companyName NOT IN ('레이')
-                group by bsa.companyName 
+                SELECT bsa.company_name, count(*) as cnt 
+                FROM ( SELECT * FROM sector_blog WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb 
+                INNER JOIN blog_thema_analysis AS bsa ON pb.blog_id = bsa.blog_id 
+                WHERE bsa.company_name NOT IN ('레이')
+                group by bsa.company_name 
                 order by cnt 
                 desc limit {topN};
                 """)
@@ -135,11 +135,11 @@ class CreateAggregateTable():
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             dff = self.connector.default_query(
                 f"""
-                SELECT bsa.companyName, count(*) as cnt 
-                FROM ( SELECT * FROM politician_blog_TB WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb 
-                INNER JOIN blog_sector_analysis_TB AS bsa ON pb.blogID = bsa.blogID 
-                WHERE bsa.companyName NOT IN ('레이')
-                group by bsa.companyName 
+                SELECT bsa.company_name, count(*) as cnt 
+                FROM ( SELECT * FROM politician_blog WHERE Date >= '{start_date}' AND Date <= '{end_date}' ) AS pb 
+                INNER JOIN blog_sector_analysis AS bsa ON pb.blog_id = bsa.blog_id 
+                WHERE bsa.company_name NOT IN ('레이')
+                group by bsa.company_name 
                 order by cnt 
                 desc limit {topN};
                 """)
@@ -155,11 +155,11 @@ class CreateAggregateTable():
 
         df = self.connector.default_query(
             f"""
-            select companyName,name,count(*) as cnt 
-                from politician_blog_TB as pb 
-                join blog_stock_analysis_TB as ba on pb.blogid = ba.blogid 
-                WHERE date >= '20240301' AND date <= '20240307'  AND companyName NOT IN ('레이')
-                group by companyName,name 
+            select company_name,name,count(*) as cnt 
+                from politician_blog as pb 
+                join blog_politician_analysis as ba on pb.blog_id = ba.blog_id 
+                WHERE date >= '20240301' AND date <= '20240307'  AND company_name NOT IN ('레이')
+                group by company_name,name 
             """
         )
         result = df.groupby('name').apply(lambda x: x.nlargest(10, 'cnt')).reset_index(drop=True)
@@ -177,15 +177,15 @@ class CreateAggregateTable():
             end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             df = self.connector.default_query(
                 f"""
-                select companyName,name,count(*) as cnt 
-                    from politician_blog_TB as pb 
-                    join blog_stock_analysis_TB as ba on pb.blogid = ba.blogid 
-                    WHERE date >= '{start_date}' AND date <= '{end_date}'  AND companyName NOT IN ('레이')
-                    group by companyName,name 
+                select company_name,name,count(*) as cnt 
+                    from politician_blog as pb 
+                    join blog_politician_analysis as ba on pb.blog_id = ba.blog_id 
+                    WHERE date >= '{start_date}' AND date <= '{end_date}'  AND company_name NOT IN ('레이')
+                    group by company_name,name 
                 """
             )
-            df_c = df.groupby('companyName').apply(lambda x: x.nlargest(topN, 'cnt')).reset_index(drop=True)
-            df_c['ranking'] = df_c.groupby('companyName').cumcount() + 1
+            df_c = df.groupby('company_name').apply(lambda x: x.nlargest(topN, 'cnt')).reset_index(drop=True)
+            df_c['ranking'] = df_c.groupby('company_name').cumcount() + 1
             df_c['period'] = period
             df_c['category'] = "politician"
             category_df_list.append(df_c)
@@ -198,15 +198,15 @@ class CreateAggregateTable():
 
             df = self.connector.default_query(
                 f"""
-                    select companyName,thema as name,count(*) as cnt 
-                    from thema_blog_TB as pb 
-                    join blog_thema_analysis_TB as ba on pb.blogid = ba.blogid  
-                    WHERE date >= '{start_date}' AND date <= '{end_date}'  AND companyName NOT IN ('레이')
-                    group by companyName,thema ;
+                    select company_name,thema as name,count(*) as cnt 
+                    from thema_blog as pb 
+                    join blog_thema_analysis as ba on pb.blog_id = ba.blog_id  
+                    WHERE date >= '{start_date}' AND date <= '{end_date}'  AND company_name NOT IN ('레이')
+                    group by company_name,thema ;
                 """
             )
-            df_c = df.groupby('companyName').apply(lambda x: x.nlargest(topN, 'cnt')).reset_index(drop=True)
-            df_c['ranking'] = df_c.groupby('companyName').cumcount() + 1
+            df_c = df.groupby('company_name').apply(lambda x: x.nlargest(topN, 'cnt')).reset_index(drop=True)
+            df_c['ranking'] = df_c.groupby('company_name').cumcount() + 1
             df_c['period'] = period
             df_c['category'] = "thema"
             category_df_list.append(df_c)
@@ -219,15 +219,15 @@ class CreateAggregateTable():
 
             df = self.connector.default_query(
                 f"""
-                    select companyName,sector as name,count(*) as cnt 
-                    from sector_blog_TB as pb 
-                    join blog_sector_analysis_TB as ba on pb.blogid = ba.blogid 
-                    WHERE date >= '{start_date}' AND date <= '{end_date}'  AND companyName NOT IN ('레이')
-                    group by companyName,sector ;
+                    select company_name,sector as name,count(*) as cnt 
+                    from sector_blog as pb 
+                    join blog_sector_analysis as ba on pb.blog_id = ba.blog_id 
+                    WHERE date >= '{start_date}' AND date <= '{end_date}'  AND company_name NOT IN ('레이')
+                    group by company_name,sector ;
                 """
             )
-            df_c = df.groupby('companyName').apply(lambda x: x.nlargest(topN, 'cnt')).reset_index(drop=True)
-            df_c['ranking'] = df_c.groupby('companyName').cumcount() + 1
+            df_c = df.groupby('company_name').apply(lambda x: x.nlargest(topN, 'cnt')).reset_index(drop=True)
+            df_c['ranking'] = df_c.groupby('company_name').cumcount() + 1
             df_c['period'] = period
             df_c['category'] = "sector"
             category_df_list.append(df_c)
@@ -252,11 +252,11 @@ class CreateAggregateTable():
         end_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         df = self.connector.default_query(
             f"""
-            select companyName as name,date ,count(*) as cnt 
-            from politician_blog_TB as pb 
-            join blog_stock_analysis_TB as ba on pb.blogid = ba.blogid
-            WHERE date >= '{start_date}' AND date <= '{end_date}'  AND companyName NOT IN ('레이')
-            group by companyName,date ;
+            select company_name as name,date ,count(*) as cnt 
+            from politician_blog as pb 
+            join blog_politician_analysis as ba on pb.blog_id = ba.blog_id
+            WHERE date >= '{start_date}' AND date <= '{end_date}'  AND company_name NOT IN ('레이')
+            group by company_name,date ;
             """
         )
         df['category'] = "stock"
@@ -265,8 +265,8 @@ class CreateAggregateTable():
         df2 = self.connector.default_query(
             f"""
             select name,date ,count(*) as cnt 
-            from politician_blog_TB as pb 
-            join blog_stock_analysis_TB as ba on pb.blogid = ba.blogid
+            from politician_blog as pb 
+            join blog_politician_analysis as ba on pb.blog_id = ba.blog_id
             WHERE date >= '{start_date}' AND date <= '{end_date}' 
             group by name,date ;
             """
@@ -276,11 +276,11 @@ class CreateAggregateTable():
 
         df = self.connector.default_query(
             f"""
-            select companyName as name,date ,count(*) as cnt 
-            from thema_blog_TB as pb 
-            join blog_thema_analysis_TB as ba on pb.blogid = ba.blogid
-            WHERE date >= '{start_date}' AND date <= '{end_date}' AND companyName NOT IN ('레이')
-            group by companyName,date ;
+            select company_name as name,date ,count(*) as cnt 
+            from thema_blog as pb 
+            join blog_thema_analysis as ba on pb.blog_id = ba.blog_id
+            WHERE date >= '{start_date}' AND date <= '{end_date}' AND company_name NOT IN ('레이')
+            group by company_name,date ;
             """
         )
         df['category'] = "stock"
@@ -289,8 +289,8 @@ class CreateAggregateTable():
         df2 = self.connector.default_query(
             f"""
             select thema as name,date ,count(*) as cnt 
-            from thema_blog_TB as pb 
-            join blog_thema_analysis_TB as ba on pb.blogid = ba.blogid
+            from thema_blog as pb 
+            join blog_thema_analysis as ba on pb.blog_id = ba.blog_id
             WHERE date >= '{start_date}' AND date <= '{end_date}' 
             group by thema,date ;
             """
@@ -300,13 +300,13 @@ class CreateAggregateTable():
 
         df = self.connector.default_query(
             f"""
-            select companyName as name,date ,count(*) as cnt 
-            from sector_blog_TB as pb 
-            join blog_sector_analysis_TB as ba on pb.blogid = ba.blogid
-            WHERE date >= '{start_date}' AND date <= '{end_date}' AND companyName NOT IN ('레이')
+            select company_name as name,date ,count(*) as cnt 
+            from sector_blog as pb 
+            join blog_sector_analysis as ba on pb.blog_id = ba.blog_id
+            WHERE date >= '{start_date}' AND date <= '{end_date}' AND company_name NOT IN ('레이')
 
 
-            group by companyName,date ;
+            group by company_name,date ;
             """
         )
         df['category'] = "stock"
@@ -315,8 +315,8 @@ class CreateAggregateTable():
         df2 = self.connector.default_query(
             f"""
             select sector as name,date ,count(*) as cnt 
-            from sector_blog_TB as pb 
-            join blog_sector_analysis_TB as ba on pb.blogid = ba.blogid
+            from sector_blog as pb 
+            join blog_sector_analysis as ba on pb.blog_id = ba.blog_id
             WHERE date >= '{start_date}' AND date <= '{end_date}' 
             group by sector,date ;
             """
@@ -332,10 +332,10 @@ class CreateAggregateTable():
     현재 주식 가격 
     '''
     def now_stock_price_topN(self,topN):
-        # end_date = self.connector.default_query(f"select max(date) from KR_STOCK_PRICE_TB;").values[0][0]
-        # dff = self.connector.default_query(f"select pr.ticker,info.companyName, pr.close,pr.changeRate from KR_STOCK_PRICE_TB as pr join KR_STOCK_INFO_TB as info on pr.ticker = info.ticker where pr.date = '{end_date}' order by pr.changeRate desc limit {topN}; ")
+        # end_date = self.connector.default_query(f"select max(date) from stock_price;").values[0][0]
+        # dff = self.connector.default_query(f"select pr.ticker,info.company_name, pr.close,pr.change_rate from stock_price as pr join stock_info as info on pr.ticker = info.ticker where pr.date = '{end_date}' order by pr.change_rate desc limit {topN}; ")
         # dff["ranking"]  = dff.index +1
-        stock_info_df = self.connector.default_query(f"select companyName, ticker from KR_STOCK_INFO_TB;")
+        stock_info_df = self.connector.default_query(f"select company_name, ticker from stock_info;")
         """국내 종목 주가 업데이트"""
         crawler = StockCrawler()
         end_date = datetime.datetime.now().strftime('%Y-%m-%d')
