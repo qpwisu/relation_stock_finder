@@ -4,7 +4,7 @@ import time
 
 import pandas as pd
 import schedule
-
+import os 
 from mysql_connector import MySQLDataConnector
 from stock_crawler import StockCrawler
 from category_crawler import CategoryCrawler
@@ -128,11 +128,10 @@ def initial():
 def update_1D():
     print("test start")
     crawler = StockCrawler()
-    connector = MySQLDataConnector(user='root',
-                                   password='1234',
-                                   host='my-mysql-db',
-                                   port='3306',
-                                   database='STOCK')
+    connector = MySQLDataConnector(user=os.getenv('MYSQL_USER', 'root'),
+                               password=os.getenv('MYSQL_PASSWORD', '1234'),
+                               host=os.getenv('MYSQL_HOST', 'localhost'),
+                               database=os.getenv('MYSQL_DATABASE', 'STOCK'))
 
     """국내 종목 정보 업데이트"""
     kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
@@ -264,11 +263,12 @@ def update_1D():
 
 def update_1M():
     crawler = StockCrawler()
-    connector = MySQLDataConnector(user='root',
-                                   password='1234',
-                                   host='localhost',
-                                   port="3037",
-                                   database='STOCK')
+    connector = MySQLDataConnector(
+                               user=os.getenv('MYSQL_USER', 'root'),
+                               password=os.getenv('MYSQL_PASSWORD', '1234'),
+                               host=os.getenv('MYSQL_HOST', 'localhost'),
+                               database=os.getenv('MYSQL_DATABASE', 'STOCK'))
+
     create_aggregate_table = CreateAggregateTable(connector)
     # 현재 주식 가격
     agg_df7 = create_aggregate_table.now_stock_price_topN(10)
@@ -287,7 +287,7 @@ def test():
     create_aggregate_table = CreateAggregateTable(connector)
 
     connector.close()
-    
+
 def run_task():
     now = datetime.now()
     # 현재 요일이 월요일(0)부터 금요일(4) 사이인지, 그리고 현재 시간이 오전 9시부터 오후 4시 사이인지 확인

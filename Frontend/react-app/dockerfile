@@ -1,4 +1,5 @@
-FROM node:13.12.0-alpine
+# npm run build 후
+FROM node:16
 WORKDIR /react-to-do/frontend
 COPY package.json package-lock.json ./
 RUN npm install 

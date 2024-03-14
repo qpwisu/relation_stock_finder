@@ -21,25 +21,21 @@ services:
 
     
   backend:
-    build:
-      context: ./Backend
-      dockerfile: dockerfile
+    image: qpwisu/stock-api:latest
     restart: always
     ports:
-      - "8082:8082"
+      - "8081:8081"
     depends_on:
       - db
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://my-mysql-db:3307/stock
+      - SPRING_DATASOURCE_URL=jdbc:mysql://my-mysql-db/STOCK
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
     container_name: my-backend  # 컨테이너에 명시적으로 이름 지정
 
   crawler:
-    build:
-      context: ./Crawler
-      dockerfile: dockerfile
+    image: qpwisu/stock-crawler:latest
     # volumes:
     #   - ./Crawler:/app
     depends_on:
@@ -50,6 +46,15 @@ services:
       - MYSQL_PORT=3307
     container_name: my-crawler  # 컨테이너에 명시적으로 이름 지정
 
+  frontend:
+    image: qpwisu/stock-react:latest
+    depends_on:
+      - crawler
+    restart: always
+    environment:
+      - REACT_APP_HOST=${REACT_APP_HOST}
+      - REACT_APP_PORT=8081
+    container_name: my-react
 
 volumes:
   my-db:  # 볼륨 정의
