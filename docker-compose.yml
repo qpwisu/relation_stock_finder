@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      # - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://my-mysql-db/STOCK
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
@@ -53,6 +53,8 @@ services:
     environment:
       - REACT_APP_HOST=${REACT_APP_HOST}
       - REACT_APP_PORT=8081
+    ports:
+      - "8081:8081"
     container_name: my-react
 
 volumes:
