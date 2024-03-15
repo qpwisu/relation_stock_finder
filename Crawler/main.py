@@ -132,43 +132,43 @@ def update_1D():
                                password=os.getenv('MYSQL_PASSWORD', '1234'),
                                host=os.getenv('MYSQL_HOST', 'localhost'),
                                database=os.getenv('MYSQL_DATABASE', 'STOCK'))
-
-    """국내 종목 정보 업데이트"""
-    kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
-    df_kr = crawler.kr_stock_info_crawler(kr_ticker)
-    connector.upload_dataframe(df_kr, 'stock_info')
-
-    """국내 종목 주가 업데이트"""
-    kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
-    last_date = connector.search_last_date("stock_price")
-    start_date = str(last_date + datetime.timedelta(days=1)).replace("-", "")
-    end_date = (datetime.datetime.now() - datetime.timedelta(days=1))
-    df_kr_price = crawler.kr_stock_price_crawler(kr_ticker, start_date, end_date)
-    connector.upload_dataframe(df_kr_price, 'stock_price')
-
-    '''
-    테마, 업종 업테이트
-    '''
-    sectors = crawler.sector_crawler()["sector"].values
-    exist_sector = connector.select_columns("sector",["sector"])["sector"].values
-    result = [item for item in sectors if item not in exist_sector]
-    if result:
-        df_sector = pd.DataFrame({"sector":result})
-        connector.upload_dataframe(df_sector, 'sector')
-
-    themas = crawler.thema_crawler()
-    exist_thema = connector.select_columns("thema",["thema"])["thema"].values
-    result = [item for item in themas if item not in exist_thema]
-    if result:
-        df_sector = pd.DataFrame({"thema":result})
-        connector.upload_dataframe(df_sector, 'thema')
-
-
-    '''
-    정치인 테이블 업데이트
-    '''
-    politician = pd.read_csv("data/politician.csv")
-    connector.update_politician_dataframe(politician, 'politician')
+    #
+    # """국내 종목 정보 업데이트"""
+    # kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
+    # df_kr = crawler.kr_stock_info_crawler(kr_ticker)
+    # connector.upload_dataframe(df_kr, 'stock_info')
+    #
+    # """국내 종목 주가 업데이트"""
+    # kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
+    # last_date = connector.search_last_date("stock_price")
+    # start_date = str(last_date + datetime.timedelta(days=1)).replace("-", "")
+    # end_date = (datetime.datetime.now() - datetime.timedelta(days=1))
+    # df_kr_price = crawler.kr_stock_price_crawler(kr_ticker, start_date, end_date)
+    # connector.upload_dataframe(df_kr_price, 'stock_price')
+    #
+    # '''
+    # 테마, 업종 업테이트
+    # '''
+    # sectors = crawler.sector_crawler()["sector"].values
+    # exist_sector = connector.select_columns("sector",["sector"])["sector"].values
+    # result = [item for item in sectors if item not in exist_sector]
+    # if result:
+    #     df_sector = pd.DataFrame({"sector":result})
+    #     connector.upload_dataframe(df_sector, 'sector')
+    #
+    # themas = crawler.thema_crawler()
+    # exist_thema = connector.select_columns("thema",["thema"])["thema"].values
+    # result = [item for item in themas if item not in exist_thema]
+    # if result:
+    #     df_sector = pd.DataFrame({"thema":result})
+    #     connector.upload_dataframe(df_sector, 'thema')
+    #
+    #
+    # '''
+    # 정치인 테이블 업데이트
+    # '''
+    # politician = pd.read_csv("data/politician.csv")
+    # connector.update_politician_dataframe(politician, 'politician')
     '''
     네이버 정치인 관련주 검색한 블로그글 크롤링 및 업로드
     '''
@@ -294,15 +294,15 @@ def run_task():
     if now.weekday() <= 4 and 9 <= now.hour < 16:
         update_1M()
 
-schedule.every().day.at("00:01").do(update_1D())
-schedule.every().minute.do(run_task)
+# schedule.every().day.at("00:01").do(update_1D())
+# schedule.every().minute.do(run_task)
+#
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
-
-# if __name__ == "__main__":
-#     # initial()
-#     update_1D()
+if __name__ == "__main__":
+    # initial()
+    update_1D()
     # update_1M()
     # test()

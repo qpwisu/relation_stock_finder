@@ -29,9 +29,11 @@ services:
       - db
     environment:
       # - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://my-mysql-db/STOCK
+      - SPRING_DATASOURCE_URL=jdbc:mysql://my-mysql-db:3306/STOCK?useSSL=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
+      - cors.allowedOrigins=${SPRING_HOST}
+
     container_name: my-backend  # 컨테이너에 명시적으로 이름 지정
 
   crawler:
@@ -44,6 +46,7 @@ services:
       - MYSQL_HOST=my-mysql-db
       - MYSQL_PORT=3307
     container_name: my-crawler  # 컨테이너에 명시적으로 이름 지정
+    command: tail -f /dev/null # 아무것도 안하고 컨테이너 유지 
 
   frontend:
     image: qpwisu/stock-react:latest
