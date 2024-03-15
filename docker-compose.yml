@@ -54,7 +54,7 @@ services:
       - REACT_APP_HOST=${REACT_APP_HOST}
       - REACT_APP_PORT=8081
     ports:
-      - "8081:8081"
+      - "3000:3000"
     container_name: my-react
 
 volumes:
