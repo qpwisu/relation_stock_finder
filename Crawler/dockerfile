@@ -36,17 +36,27 @@ RUN playwright install
 ARG TARGETARCH
 
 # TARGETARCH에 따라 다른 크롬 버전 설치
+
+RUN apt-get update && apt-get install -y \
+  wget \
+  fonts-liberation \
+  libgtk-3-0 \
+  libu2f-udev \
+  libvulkan1 \
+  xdg-utils \
+  && rm -rf /var/lib/apt/lists/*
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
         echo "Installing Chrome for amd64..." && \
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
         apt install -y ./google-chrome-stable_current_amd64.deb ; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
-        echo "Installing Chrome for arm64..." && \
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb && \
-        apt install -y ./google-chrome-stable_current_arm64.deb ; \
+        echo "Installing Chromium for arm64..." && \
+        apt-get update && apt-get install -y chromium ; \
     else \
         echo "Unsupported architecture: $TARGETARCH" && exit 1 ; \
     fi
+
+
 
 # MySQL 서비스의 호스트 이름과 포트를 지정
 ENV MYSQL_HOST=my-mysql-db

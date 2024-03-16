@@ -22,6 +22,7 @@ class CategoryCrawler:
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--headless')  # 창 없는 모드
         self.options.add_argument('--no-sandbox')
+        #self.options.binary_location = "/usr/bin/chromium" 
         self.options.add_argument('--disable-dev-shm-usage')
         prefs = {"profile.managed_default_content_settings.images": 2,  # 이미지 로드 차단
                  "javascript.enabled": False}  # 자바스크립트 실행 차단

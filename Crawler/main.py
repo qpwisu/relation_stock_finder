@@ -294,15 +294,17 @@ def run_task():
     if now.weekday() <= 4 and 9 <= now.hour < 16:
         update_1M()
 
-# schedule.every().day.at("00:01").do(update_1D())
-# schedule.every().minute.do(run_task)
-#
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
+update_1D()
 
-if __name__ == "__main__":
+schedule.every().day.at("00:01").do(update_1D())
+schedule.every().minute.do(run_task)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+
+# if __name__ == "__main__":
     # initial()
-    update_1D()
+    # update_1D()
     # update_1M()
     # test()
