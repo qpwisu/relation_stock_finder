@@ -90,7 +90,7 @@ function FirstPage() {
                   <TableCell>Ticker</TableCell>
                   <TableCell>company_name</TableCell>
                   <TableCell align="right">Close</TableCell>
-                  <TableCell align="right">ChangeRate</TableCell>
+                  <TableCell align="right">change_rate</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -99,7 +99,7 @@ function FirstPage() {
                     <TableCell component="th" scope="row">{row.ticker}</TableCell>
                     <TableCell style={{ cursor: 'pointer' ,fontWeight:"bold"}} onClick={() => handleNameClick("stock",row.company_name)}>{row.company_name}</TableCell>
                     <TableCell align="right">{row.close}</TableCell>
-                    <TableCell align="right" style={{color:"red",fontWeight:"bold"}}>{row.changeRate}</TableCell>
+                    <TableCell align="right" style={{color:"red",fontWeight:"bold"}}>{row.change_rate}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

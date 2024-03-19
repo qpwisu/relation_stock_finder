@@ -63,8 +63,8 @@ function StockPage() {
     };
 
     // 가격 변동률에 따른 색상 설정
-    const changeRateStyle = (changeRate) => ({
-        color: changeRate >= 0 ? '#ff0000' : '#0000ff',
+    const change_rateStyle = (change_rate) => ({
+        color: change_rate >= 0 ? '#ff0000' : '#0000ff',
     });
 
     const chartContainerRef = useRef(null); // 차트를 그릴 컨테이너의 ref
@@ -189,11 +189,11 @@ function StockPage() {
                                         {stockInfo.company_name} ({stockInfo.ticker})
                                     </Typography>
                                     <Box display="flex" justifyContent="flex-start" alignItems="center" gap={2}>
-                                    <Typography variant="h5" component="h2" style={stockPrice ? changeRateStyle(stockPrice.changeRate) : {}} gutterBottom>
+                                    <Typography variant="h5" component="h2" style={stockPrice ? change_rateStyle(stockPrice.change_rate) : {}} gutterBottom>
                                     {stockPrice ? stockPrice.close.toLocaleString() : '로딩 중'}원
                                     </Typography>
-                                    <Typography variant="h5" component="h2" style={stockPrice ? changeRateStyle(stockPrice.changeRate) : {}} gutterBottom>
-                                    {stockPrice && stockPrice.changeRate > 0 ? `(+${stockPrice.changeRate}%)` : `(${stockPrice.changeRate}%)`}
+                                    <Typography variant="h5" component="h2" style={stockPrice ? change_rateStyle(stockPrice.change_rate) : {}} gutterBottom>
+                                    {stockPrice && stockPrice.change_rate > 0 ? `(+${stockPrice.change_rate}%)` : `(${stockPrice.change_rate}%)`}
                                     </Typography>
 
                                     
