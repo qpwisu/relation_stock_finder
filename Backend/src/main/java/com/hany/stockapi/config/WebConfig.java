@@ -11,6 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${cors.allowedOrigins}")
     private String allowedOrigins;
+    //http://localhost:3000
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

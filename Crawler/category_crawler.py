@@ -1,112 +1,79 @@
-from datetime import timedelta, datetime
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
+from playwright.sync_api import sync_playwright
 import pandas as pd
+from datetime import datetime
+from playwright.async_api import async_playwright
+import asyncio
+from datetime import timedelta, datetime
 import time
-from tqdm import tqdm
-#
-# '''
-# 네이버 블로그에서 '정치인 관련주'로 검색을 해서 나온 제목들을 크롤링
-# start_date와 end_date를 받아서 하루씩 검색되는 블로그글을 전부 크롤링
-# 크롤링 방식은 무한 스크롤을 통해 블로그 테이블 맨 아래로 이동해 제목만 긁어오기
-# 테이블은 정치인 , 뉴스제목, 뉴스헤더, 링크 , 날짜
-# '''r
-#
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
+import tqdm
+from tqdm.asyncio import tqdm
 
 class CategoryCrawler:
-    def __init__(self):
-        self.options = webdriver.ChromeOptions()
-        self.options.add_argument('--headless')  # 창 없는 모드
-        self.options.add_argument('--no-sandbox')
-        #self.options.binary_location = "/usr/bin/chromium" 
-        self.options.add_argument('--disable-dev-shm-usage')
-        prefs = {"profile.managed_default_content_settings.images": 2,  # 이미지 로드 차단
-                 "javascript.enabled": False}  # 자바스크립트 실행 차단
-        self.options.add_experimental_option("prefs", prefs)
 
-    def start_driver(self):
-        max_attempts = 3  # 최대 시도 횟수
-        for attempt in range(max_attempts):
+
+    async def blog_crawler(self, semaphore, context,  name, date):
+        async with semaphore:
+            page = await context.new_page()
+            url = f'https://search.naver.com/search.naver?ssc=tab.blog.all&query={name} 관련주&sm=tab_opt&nso=so%3Ar%2Cp%3Afrom{date}to{date}'
+            await page.goto(url, timeout=30000)
+
+            last_height = await page.evaluate('document.body.scrollHeight')
+            last_time = time.time()
+
             try:
-                service = Service(ChromeDriverManager().install())
-                driver = webdriver.Chrome(service=service, options=self.options)
-                return driver  # 드라이버 초기화에 성공하면 반환
+                while True:
+                    # 스크롤 다운
+                    await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+                    # 현재 시간 가져오기
+                    current_time = time.time()
+
+                    # 마지막 높이 체크 이후 2초가 지났는지 확인
+                    if current_time - last_time > 2:
+                        # 새로운 스크롤 높이를 계산
+                        new_height = await page.evaluate('document.body.scrollHeight')
+                        if new_height == last_height:
+                            # 높이 변화가 없으면 종료
+                            break
+                        else:
+                            # 높이 변화가 있으면 업데이트
+                            last_height = new_height
+                            last_time = time.time()  # 마지막 체크 시간 업데이트
+                    # time.sleep(0.1)  # 너무 빠른 스크롤 방지를 위해 짧은 대기 시간 추가
             except Exception as e:
-                print(f"ChromeDriverManager install failed. Attempt {attempt + 1}/{max_attempts}. Error: {e}")
-                if attempt < max_attempts - 1:
-                    time.sleep(5)  # 다음 재시도 전 5초 대기
-                else:
-                    raise  # 최대 시도 횟수에 도달했으면 예외를 다시 발생시킴
+                print(e)
 
-    def blog_crawler(self, name, date):
-        url = f'https://search.naver.com/search.naver?ssc=tab.blog.all&query={name} 관련주&sm=tab_opt&nso=so%3Ar%2Cp%3Afrom{date}to{date}'
-        driver = self.start_driver()
+            title_elements = await page.query_selector_all('div.title_area > a')
+            title_list = [await title.text_content() for title in title_elements]
+            href_list = [await title.get_attribute('href') for title in title_elements]
 
-        driver.get(url)
-        last_height = driver.execute_script("return document.body.scrollHeight")
-        last_time = time.time()
+            header_elements = await page.query_selector_all('div.dsc_area > a.dsc_link')
+            header_list = [await header.text_content() for header in header_elements]
 
-        try:
-            while True:
-                # 스크롤 다운
-                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            if len(title_list) != len(header_list):
+                header_list = [None] * len(title_list)  # 헤더가 없는 경우 None으로 채움
 
-                # 현재 시간 가져오기
-                current_time = time.time()
-
-                # 마지막 높이 체크 이후 2초가 지났는지 확인
-                if current_time - last_time > 2:
-                    # 새로운 스크롤 높이를 계산
-                    new_height = driver.execute_script("return document.body.scrollHeight")
-                    if new_height == last_height:
-                        # 높이 변화가 없으면 종료
-                        break
-                    else:
-                        # 높이 변화가 있으면 업데이트
-                        last_height = new_height
-                        last_time = time.time()  # 마지막 체크 시간 업데이트
-                # time.sleep(0.1)  # 너무 빠른 스크롤 방지를 위해 짧은 대기 시간 추가
-        except Exception as e:
-            print(e)
-
-        blog_titles = driver.find_elements(By.CSS_SELECTOR, 'div.title_area > a')
-        title_list = [title.text for title in blog_titles]
-        href_list = [title.get_property("href") for title in blog_titles]
-        blog_header = driver.find_elements(By.CSS_SELECTOR, 'div.dsc_area > a.dsc_link')
-        header_list = [header.text for header in blog_header]
-
-        if len(title_list) != len(header_list):  # 헤더가 없는 경우가 있어 에러 처리 필요 ex) 안철수 20230220
-            header_list = []
-            elements = driver.find_elements(By.CSS_SELECTOR, 'div.detail_box')
-            for ele in elements:
-                headers = ele.find_elements(By.CSS_SELECTOR, 'div.dsc_area > a.dsc_link')
-                # headers가 존재하는 경우에만 리스트에 추가
-                if len(headers) > 0:
-                    header_list.append(headers[0].text)
-                else:
-                    header_list.append(None)
-
-        if len(title_list) == len(header_list) == len(href_list):
             df = pd.DataFrame({
-                'name': name,
+                'name': [name] * len(title_list),
                 'title': title_list,
                 'header': header_list,
                 'href': href_list,
-                'date': date
+                'date': [date] * len(title_list)
             })
-        else:
-            print("error not same length : ", name, date)
-            return
+            # 브라우저 탭 종료
+            # 쿠키 제거
+            await context.clear_cookies()
+            # 모든 페이지에 대해 로컬 스토리지 클리어
+            await page.evaluate("localStorage.clear()")
+            # 모든 페이지에 대해 세션 스토리지 클리어
+            await page.evaluate("sessionStorage.clear()")
+            await page.close()
 
-        driver.quit()
-        return df
+            return df
 
-    def politician_blog_crawler(self, name_list, start_date, end_date):
-        df_li = []
+
+
+
+    async def politician_blog_crawler(self, name_list, start_date, end_date):
 
         if isinstance(start_date, datetime):
             start_date = start_date.date()
@@ -122,19 +89,26 @@ class CategoryCrawler:
         print(date_range)
         if not date_range:
             return False
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            futures = []
+
+        async with async_playwright() as p:
+            # browser = await p.chromium.launch(headless=True)
+            # chrome gpu 가속에 메모리 사용량이 너무 커서 끔
+            browser = await p.chromium.launch(headless=True, args=['--disable-gpu'])
+            context = await browser.new_context(
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36')
+            df_list = []
+
+            semaphore = asyncio.Semaphore(4) #4
+            futures =[]
             for name in name_list:
                 for date in date_range:
-                    futures.append(executor.submit(self.blog_crawler, name, date.strftime('%Y%m%d')))
+                    futures.append(self.blog_crawler(semaphore, context, name, date.strftime('%Y%m%d')))
 
-            for future in tqdm(as_completed(futures), total=len(futures)):
-                result = future.result()
-                df_li.append(result)  # 결과를 DataFrame에 추가하는 로직
+            for future in tqdm(asyncio.as_completed(futures), total=len(futures)):
+                tmp_df = await future
+                if tmp_df is not None:
+                    df_list.append(tmp_df)
 
-        df_combined = pd.concat(df_li, ignore_index=True)
-        return df_combined
-
-# 사용 예시
-# t = CategoryCrawler()
-# t.politician_blog_crawler(["이재명", "조국"], "20240201", "20240226")
+            df = pd.concat(df_list, ignore_index=True)
+            await browser.close()
+            return df

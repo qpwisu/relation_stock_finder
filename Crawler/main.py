@@ -63,7 +63,7 @@ def initial():
     '''
     sector = connector.select_columns("sector",["sector"])["sector"].tolist()
     politician_crawler = CategoryCrawler()
-    sector_df = politician_crawler.politician_blog_crawler(sector, "20230801", now)
+    sector_df = asyncio.run(politician_crawler.politician_blog_crawler(sector, "20230801", now))
     sector_df.rename(columns={"name": "sector"}, inplace=True)
     connector.upload_dataframe(sector_df, 'sector_blog')
 
@@ -79,7 +79,7 @@ def initial():
     '''
     politician_names = connector.select_columns("politician",["name"])["name"].tolist()
     politician_crawler = CategoryCrawler()
-    blog_df = politician_crawler.politician_blog_crawler(politician_names,"20230101",now)
+    blog_df = asyncio.run(politician_crawler.politician_blog_crawler(politician_names,"20230101",now))
     connector.upload_dataframe(blog_df, 'politician_blog')
 
     '''
@@ -126,58 +126,62 @@ def initial():
     업데이트는 하루 지나고 00시에 실행 
 '''
 def update_1D():
-    print("test start")
+    print("start update_1D")
     crawler = StockCrawler()
     connector = MySQLDataConnector(user=os.getenv('MYSQL_USER', 'root'),
                                password=os.getenv('MYSQL_PASSWORD', '1234'),
                                host=os.getenv('MYSQL_HOST', 'localhost'),
                                database=os.getenv('MYSQL_DATABASE', 'STOCK'))
-    #
-    # """국내 종목 정보 업데이트"""
-    # kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
-    # df_kr = crawler.kr_stock_info_crawler(kr_ticker)
-    # connector.upload_dataframe(df_kr, 'stock_info')
-    #
-    # """국내 종목 주가 업데이트"""
-    # kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
-    # last_date = connector.search_last_date("stock_price")
-    # start_date = str(last_date + datetime.timedelta(days=1)).replace("-", "")
-    # end_date = (datetime.datetime.now() - datetime.timedelta(days=1))
-    # df_kr_price = crawler.kr_stock_price_crawler(kr_ticker, start_date, end_date)
-    # connector.upload_dataframe(df_kr_price, 'stock_price')
-    #
-    # '''
-    # 테마, 업종 업테이트
-    # '''
-    # sectors = crawler.sector_crawler()["sector"].values
-    # exist_sector = connector.select_columns("sector",["sector"])["sector"].values
-    # result = [item for item in sectors if item not in exist_sector]
-    # if result:
-    #     df_sector = pd.DataFrame({"sector":result})
-    #     connector.upload_dataframe(df_sector, 'sector')
-    #
-    # themas = crawler.thema_crawler()
-    # exist_thema = connector.select_columns("thema",["thema"])["thema"].values
-    # result = [item for item in themas if item not in exist_thema]
-    # if result:
-    #     df_sector = pd.DataFrame({"thema":result})
-    #     connector.upload_dataframe(df_sector, 'thema')
-    #
-    #
-    # '''
-    # 정치인 테이블 업데이트
-    # '''
-    # politician = pd.read_csv("data/politician.csv")
-    # connector.update_politician_dataframe(politician, 'politician')
+
+    """국내 종목 정보 업데이트"""
+    print("국내 종목 정보 업데이트")
+    kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
+    df_kr = crawler.kr_stock_info_crawler(kr_ticker)
+    connector.upload_dataframe(df_kr, 'stock_info')
+
+    """국내 종목 주가 업데이트"""
+    print("국내 종목 주가 업데이트")
+    kr_ticker = connector.select_columns("stock_info", ["ticker"])["ticker"].tolist()
+    last_date = connector.search_last_date("stock_price")
+    start_date = str(last_date + datetime.timedelta(days=1)).replace("-", "")
+    end_date = (datetime.datetime.now() - datetime.timedelta(days=1))
+    df_kr_price = crawler.kr_stock_price_crawler(kr_ticker, start_date, end_date)
+    connector.upload_dataframe(df_kr_price, 'stock_price')
+
+    '''
+    테마, 업종 업테이트
+    '''
+    print('테마, 업종 업테이트')
+    sectors = crawler.sector_crawler()["sector"].values
+    exist_sector = connector.select_columns("sector",["sector"])["sector"].values
+    result = [item for item in sectors if item not in exist_sector]
+    if result:
+        df_sector = pd.DataFrame({"sector":result})
+        connector.upload_dataframe(df_sector, 'sector')
+
+    themas = crawler.thema_crawler()
+    exist_thema = connector.select_columns("thema",["thema"])["thema"].values
+    result = [item for item in themas if item not in exist_thema]
+    if result:
+        df_sector = pd.DataFrame({"thema":result})
+        connector.upload_dataframe(df_sector, 'thema')
+
+
+    '''
+    정치인 테이블 업데이트
+    '''
+    politician = pd.read_csv("data/politician.csv")
+    connector.update_politician_dataframe(politician, 'politician')
     '''
     네이버 정치인 관련주 검색한 블로그글 크롤링 및 업로드
     '''
+    print('네이버 정치인 관련주 검색한 블로그글 크롤링 및 업로드')
     last_date = connector.search_last_date("politician_blog")
     start_date = last_date + datetime.timedelta(days=1)
     end_date = datetime.datetime.now() - datetime.timedelta(days=1)
     politician_names = connector.select_columns("politician",["name"])["name"].tolist()
     politician_crawler = CategoryCrawler()
-    blog_df = politician_crawler.politician_blog_crawler(politician_names,start_date,end_date)
+    blog_df = asyncio.run(politician_crawler.politician_blog_crawler(politician_names,start_date,end_date))
     # blog_df = connector.default_query("select * from politician_blog where blog_id > 45350")
 
     if isinstance(blog_df, pd.DataFrame):
@@ -193,12 +197,13 @@ def update_1D():
     '''
     네이버 테마 관련주 검색한 블로그글 크롤링 및 업로드
     '''
+    print('네이버 테마 관련주 검색한 블로그글 크롤링 및 업로드')
     last_date = connector.search_last_date("thema_blog")
     start_date = last_date + datetime.timedelta(days=1)
     end_date = datetime.datetime.now() - datetime.timedelta(days=1)
     thema_names = connector.select_columns("thema",["thema"])["thema"].tolist()
     politician_crawler = CategoryCrawler()
-    blog_df = politician_crawler.politician_blog_crawler(thema_names,start_date,end_date)
+    blog_df = asyncio.run(politician_crawler.politician_blog_crawler(thema_names,start_date,end_date))
     # blog_df = connector.default_query("select * from thema_blog")
     if isinstance(blog_df, pd.DataFrame):
         blog_df.rename(columns={"name": "thema"}, inplace=True)
@@ -212,12 +217,13 @@ def update_1D():
     '''
     네이버 업종 관련주 검색한 블로그글 크롤링 및 업로드
     '''
+    print('네이버 업종 관련주 검색한 블로그글 크롤링 및 업로드')
     last_date = connector.search_last_date("sector_blog")
     start_date = last_date + datetime.timedelta(days=1)
     end_date = datetime.datetime.now() - datetime.timedelta(days=1)
     sector_names = connector.select_columns("sector",["sector"])["sector"].tolist()
     politician_crawler = CategoryCrawler()
-    blog_df = politician_crawler.politician_blog_crawler(sector_names,start_date,end_date)
+    blog_df = asyncio.run(politician_crawler.politician_blog_crawler(sector_names,start_date,end_date))
     if isinstance(blog_df, pd.DataFrame):
         blog_df.rename(columns={"name": "sector"}, inplace=True)
         connector.upload_dataframe(blog_df, 'sector_blog')
@@ -230,6 +236,7 @@ def update_1D():
     '''
     집계 테이블
     '''
+    print('집계 테이블')
     create_aggregate_table = CreateAggregateTable(connector)
     # 주식 관련 정치인 전체 언급 순위
     agg_df1 = create_aggregate_table.politician_topN(10)
@@ -262,7 +269,7 @@ def update_1D():
     connector.close()
 
 def update_1M():
-    crawler = StockCrawler()
+    print('start update_1M')
     connector = MySQLDataConnector(
                                user=os.getenv('MYSQL_USER', 'root'),
                                password=os.getenv('MYSQL_PASSWORD', '1234'),
@@ -286,6 +293,12 @@ def test():
                                    database='STOCK')
     create_aggregate_table = CreateAggregateTable(connector)
 
+    politician_names = connector.select_columns("politician",["name"])["name"].tolist()
+    politician_crawler = CategoryCrawler()
+    end_date = datetime.datetime.now() - datetime.timedelta(days=1)
+
+    blog_df = asyncio.run(politician_crawler.politician_blog_crawler(politician_names, "20240301", end_date))
+    print(blog_df)
     connector.close()
 
 def run_task():
@@ -294,17 +307,16 @@ def run_task():
     if now.weekday() <= 4 and 9 <= now.hour < 16:
         update_1M()
 
-update_1D()
 
-schedule.every().day.at("00:01").do(update_1D())
-schedule.every().minute.do(run_task)
+# schedule.every().day.at("00:01").do(update_1D())
+# schedule.every().minute.do(run_task)
+#
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
-
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # initial()
-    # update_1D()
+    update_1D()
     # update_1M()
     # test()

@@ -11,7 +11,6 @@ class MySQLDataConnector:
         """ DataFrame 데이터를 MySQL 테이블에 업로드합니다. """
         try:
             df.to_sql(name=table_name, con=self.engine, if_exists=if_exists, index=index)
-            print(f"Data uploaded successfully to {table_name}.")
         except Exception as e:
             print(f"Error uploading data: {e}")
 
@@ -41,7 +40,6 @@ class MySQLDataConnector:
         query = f"SELECT {column_names} FROM {table_name}"
         try:
             df = pd.read_sql_query(query, self.engine)
-            print(f"Data downloaded successfully from {table_name}.")
             return df
         except Exception as e:
             print(f"Error downloading data: {e}")
@@ -50,7 +48,6 @@ class MySQLDataConnector:
     def default_query(self,query):
         try:
             df = pd.read_sql_query(query, self.engine)
-            print(f"Data downloaded success")
             return df
         except Exception as e:
             print(f"Error downloading data: {e}")
@@ -61,7 +58,6 @@ class MySQLDataConnector:
         query = f"SELECT max(date) FROM {table_name};"
         try:
             df = pd.read_sql_query(query, self.engine)
-            print(f"Data downloaded successfully from {table_name}.")
             return df.values[0][0]
         except Exception as e:
             print(f"Error downloading data: {e}")
