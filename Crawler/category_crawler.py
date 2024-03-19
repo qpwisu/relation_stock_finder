@@ -13,62 +13,68 @@ class CategoryCrawler:
 
     async def blog_crawler(self, semaphore, context,  name, date):
         async with semaphore:
-            page = await context.new_page()
-            url = f'https://search.naver.com/search.naver?ssc=tab.blog.all&query={name} 관련주&sm=tab_opt&nso=so%3Ar%2Cp%3Afrom{date}to{date}'
-            await page.goto(url, timeout=30000)
-
-            last_height = await page.evaluate('document.body.scrollHeight')
-            last_time = time.time()
-
             try:
-                while True:
-                    # 스크롤 다운
-                    await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-                    # 현재 시간 가져오기
-                    current_time = time.time()
+                page = await context.new_page()
+                url = f'https://search.naver.com/search.naver?ssc=tab.blog.all&query={name} 관련주&sm=tab_opt&nso=so%3Ar%2Cp%3Afrom{date}to{date}'
+                await page.goto(url, timeout=10000)
 
-                    # 마지막 높이 체크 이후 2초가 지났는지 확인
-                    if current_time - last_time > 2:
-                        # 새로운 스크롤 높이를 계산
-                        new_height = await page.evaluate('document.body.scrollHeight')
-                        if new_height == last_height:
-                            # 높이 변화가 없으면 종료
-                            break
-                        else:
-                            # 높이 변화가 있으면 업데이트
-                            last_height = new_height
-                            last_time = time.time()  # 마지막 체크 시간 업데이트
-                    # time.sleep(0.1)  # 너무 빠른 스크롤 방지를 위해 짧은 대기 시간 추가
+                last_height = await page.evaluate('document.body.scrollHeight')
+                last_time = time.time()
+
+                try:
+                    while True:
+                        # 스크롤 다운
+                        await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+                        # 현재 시간 가져오기
+                        current_time = time.time()
+
+                        # 마지막 높이 체크 이후 2초가 지났는지 확인
+                        if current_time - last_time > 2:
+                            # 새로운 스크롤 높이를 계산
+                            new_height = await page.evaluate('document.body.scrollHeight')
+                            if new_height == last_height:
+                                # 높이 변화가 없으면 종료
+                                break
+                            else:
+                                # 높이 변화가 있으면 업데이트
+                                last_height = new_height
+                                last_time = time.time()  # 마지막 체크 시간 업데이트
+                        # time.sleep(0.1)  # 너무 빠른 스크롤 방지를 위해 짧은 대기 시간 추가
+                except Exception as e:
+                    print(e)
+
+                title_elements = await page.query_selector_all('div.title_area > a')
+                title_list = [await title.text_content() for title in title_elements]
+                href_list = [await title.get_attribute('href') for title in title_elements]
+
+                header_elements = await page.query_selector_all('div.dsc_area > a.dsc_link')
+                header_list = [await header.text_content() for header in header_elements]
+
+                if len(title_list) != len(header_list):
+                    header_list = [None] * len(title_list)  # 헤더가 없는 경우 None으로 채움
+
+                df = pd.DataFrame({
+                    'name': [name] * len(title_list),
+                    'title': title_list,
+                    'header': header_list,
+                    'href': href_list,
+                    'date': [date] * len(title_list)
+                })
+
+
+                return df
             except Exception as e:
                 print(e)
-
-            title_elements = await page.query_selector_all('div.title_area > a')
-            title_list = [await title.text_content() for title in title_elements]
-            href_list = [await title.get_attribute('href') for title in title_elements]
-
-            header_elements = await page.query_selector_all('div.dsc_area > a.dsc_link')
-            header_list = [await header.text_content() for header in header_elements]
-
-            if len(title_list) != len(header_list):
-                header_list = [None] * len(title_list)  # 헤더가 없는 경우 None으로 채움
-
-            df = pd.DataFrame({
-                'name': [name] * len(title_list),
-                'title': title_list,
-                'header': header_list,
-                'href': href_list,
-                'date': [date] * len(title_list)
-            })
-            # 브라우저 탭 종료
-            # 쿠키 제거
-            await context.clear_cookies()
-            # 모든 페이지에 대해 로컬 스토리지 클리어
-            await page.evaluate("localStorage.clear()")
-            # 모든 페이지에 대해 세션 스토리지 클리어
-            await page.evaluate("sessionStorage.clear()")
-            await page.close()
-
-            return df
+                print(name,date,"error")
+                return
+            finally:
+                # 쿠키 제거
+                await context.clear_cookies()
+                # 모든 페이지에 대해 로컬 스토리지 클리어
+                await page.evaluate("localStorage.clear()")
+                # 모든 페이지에 대해 세션 스토리지 클리어
+                await page.evaluate("sessionStorage.clear()")
+                await page.close()  # 항상 페이지를 닫음
 
 
 
