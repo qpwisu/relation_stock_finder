@@ -8,7 +8,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234  # root 비밀번호 설정
       MYSQL_DATABASE: STOCK  # 생성할 데이터베이스 이름
-      TZ:Asia/Seoul
+      TZ: Asia/Seoul
       
       # MYSQL_USER: root  # 사용자 이름
       # MYSQL_PASSWORD: 1234  # 사용자 비밀번호
