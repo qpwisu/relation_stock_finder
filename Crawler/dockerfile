@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y \
 RUN playwright install
 
 # MySQL 서비스의 호스트 이름과 포트를 지정
+ENV TZ Asia/Seoul
 ENV MYSQL_HOST=my-mysql-db
 ENV MYSQL_PORT=3307
 

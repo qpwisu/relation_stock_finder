@@ -8,6 +8,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234  # root 비밀번호 설정
       MYSQL_DATABASE: STOCK  # 생성할 데이터베이스 이름
+      TZ:Asia/Seoul
+      
       # MYSQL_USER: root  # 사용자 이름
       # MYSQL_PASSWORD: 1234  # 사용자 비밀번호
     ports:
@@ -18,6 +20,7 @@ services:
       - ./data:/docker-entrypoint-initdb.d
       - my-db:/var/lib/mysql  # 데이터 볼륨 설정
     container_name: my-mysql-db  # 컨테이너에 명시적으로 이름 지정
+
 
     
   backend:
@@ -33,6 +36,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - cors.allowedOrigins=${SPRING_HOST}
+      - TZ=Asia/Seoul
 
     container_name: my-backend  # 컨테이너에 명시적으로 이름 지정
 
@@ -56,6 +60,7 @@ services:
     environment:
       - REACT_APP_HOST=${REACT_APP_HOST}
       - REACT_APP_PORT=8081
+      - TZ=Asia/Seoul
     ports:
       - "3000:3000"
     container_name: my-react

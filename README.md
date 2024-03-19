@@ -21,7 +21,7 @@ vi .env
 docker-compose up -d  // 허브에 이미지 변경사항있을시 pull하고 up       
 # 크롤러 실행, 로그 확인 
 docker exec -d <crawler_container_id> sh -c 'python main.py > logfile.log 2>&1'
-docker exec -it <crawler_container_id> cat logfile.log
+    docker exec -it <crawler_container_id> cat logfile.log
 
 docker exec -it my-mysql-db mysql -u root -p
 
