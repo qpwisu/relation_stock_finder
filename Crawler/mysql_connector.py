@@ -11,6 +11,7 @@ class MySQLDataConnector:
         """ DataFrame 데이터를 MySQL 테이블에 업로드합니다. """
         try:
             df.to_sql(name=table_name, con=self.engine, if_exists=if_exists, index=index)
+            print(f"Data uploaded successfully to {table_name}.")
         except Exception as e:
             print(f"Error uploading data: {e}")
 

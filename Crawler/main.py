@@ -265,7 +265,6 @@ def update_1D():
     # 카테고리별로 ex) 테마와 가장 많이 언급된 종목 순위 출력
     connector.upload_dataframe(df_s, 'stock_aggregate',if_exists = "replace")
 
-
     connector.close()
 
 def update_1M():
@@ -298,25 +297,25 @@ def test():
     end_date = datetime.datetime.now() - datetime.timedelta(days=1)
 
     blog_df = asyncio.run(politician_crawler.politician_blog_crawler(politician_names, "20240301", end_date))
-    print(blog_df)
     connector.close()
 
+
 def run_task():
-    now = datetime.now()
+    now = datetime.datetime.now()
     # 현재 요일이 월요일(0)부터 금요일(4) 사이인지, 그리고 현재 시간이 오전 9시부터 오후 4시 사이인지 확인
     if now.weekday() <= 4 and 9 <= now.hour < 16:
         update_1M()
 
+update_1D()
+schedule.every().day.at("00:01").do(update_1D)
+schedule.every().minute.do(run_task)
 
-# schedule.every().day.at("00:01").do(update_1D())
-# schedule.every().minute.do(run_task)
-#
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
+while True:
+    schedule.run_pending()
+    time.sleep(5)
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # initial()
-    update_1D()
+    # update_1D()
     # update_1M()
     # test()
